@@ -1,0 +1,35 @@
+{
+  "name": "vetcare",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@10.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "ci": "npm run lint && npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.4.2",
+    "tsup": "^9.0.0",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "react-datepicker": "^9.1.0"
+  }
+}
