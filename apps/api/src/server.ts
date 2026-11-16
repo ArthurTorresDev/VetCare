@@ -21,9 +21,9 @@ app.use(errorHandler);
 if (!env.isTest) {
   const gcalService = getGoogleCalendarService();
   app.listen(env.port, () => {
-    console.log(`\n🩺 [MedPet / VetCare API] Servidor rodando em http://localhost:${env.port}`);
+    console.log(`\n[MedPet / VetCare API] Servidor rodando em http://localhost:${env.port}`);
     console.log(
-      `📅 Integração Google Agenda: ${gcalService.getStatus().isMock ? 'Simulador (Mock)' : 'API Oficial'}`,
+      `[Integracao Google Agenda] Status: ${gcalService.getStatus().isMock ? 'Simulador (Mock)' : 'API Oficial'}`,
     );
   });
 }

@@ -33,14 +33,18 @@ export const CompletedTab: React.FC<CompletedTabProps> = ({
           className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-emerald-500 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
         >
           <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-              ✓ Atendimento Concluído
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <i className="ph ph-check-circle text-xs"></i>
+              Atendimento Concluído
             </span>
             <span className="text-sm font-bold text-slate-700">
               {formatCurrencyBRL(appt.servicePrice)}
             </span>
           </div>
-          <h3 className="font-bold text-slate-800 text-lg">🐾 {appt.petName}</h3>
+          <h3 className="font-bold text-slate-800 text-lg flex items-center gap-1.5">
+            <i className="ph ph-paw-print text-sm text-slate-500"></i>
+            {appt.petName}
+          </h3>
           <p className="text-xs text-slate-500">Tutor: {appt.clientName}</p>
           <p className="text-xs text-slate-600 mt-2 font-medium">{appt.serviceName}</p>
           <p className="text-[11px] text-slate-400 mt-1">

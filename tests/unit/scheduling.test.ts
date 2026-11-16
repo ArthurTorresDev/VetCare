@@ -106,9 +106,9 @@ describe('Regras de Negócio de Agendamento (Domínio VetCare)', () => {
     expect(payload.summary).toBe(
       '[MedPet] Consulta Geral e Vacinação: Thor (Tutor: Arthur Steiner)',
     );
-    expect(payload.description).toContain('🐾 PACIENTE: Thor');
-    expect(payload.description).toContain('👤 TUTOR: Arthur Steiner (Tel: (11) 99999-8888)');
-    expect(payload.description).toContain('🔗 ID SISTEMA MEDPET: apt-123');
+    expect(payload.description).toContain('PACIENTE: Thor');
+    expect(payload.description).toContain('TUTOR: Arthur Steiner (Tel: (11) 99999-8888)');
+    expect(payload.description).toContain('ID SISTEMA MEDPET: apt-123');
     expect(payload.start.timeZone).toBe('America/Sao_Paulo');
   });
 

@@ -29,7 +29,7 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
   onStatusChange,
   serviceFilter,
   onServiceChange,
-  services,
+  services = [],
   statusCounts,
   totalCount,
   filteredCount,
@@ -50,8 +50,8 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
               key={opt.key}
               onClick={() => onStatusChange(opt.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${isSelected
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
-                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200/60'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 border border-slate-200/60'
                 }`}
             >
               <i className={`ph ${opt.icon} text-sm`}></i>
@@ -79,6 +79,11 @@ export const FilterToolbar: React.FC<FilterToolbarProps> = ({
             className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium cursor-pointer"
           >
             <option value="TODOS">Todos os Serviços</option>
+            {(services || []).map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
           </select>
         </div>
 

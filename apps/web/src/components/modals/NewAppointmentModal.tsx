@@ -1,16 +1,16 @@
-﻿'use client';
+'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ClinicService,
-  formatDateBR,
+  DateCheckResult,
   formatCurrencyBRL,
 } from '@vetcare/shared';
 import { ClientWithPets } from '../../types/index';
 import { VETS_LIST } from '../../config/constants';
-import DatePicker from "react-datepicker";
-import { ptBR } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from 'react-datepicker';
+import { ptBR } from 'date-fns/locale';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface NewAppointmentModalProps {
   isOpen: boolean;
@@ -45,6 +45,13 @@ interface NewAppointmentModalProps {
   conflictingAppointment: any | null;
   onSubmit: (e: React.FormEvent) => void;
   tutorInputRef: React.RefObject<HTMLInputElement | null>;
+
+  // Google Calendar / Verificação de Feriados & Horários MedPet
+  dateCheckResult?: DateCheckResult | null;
+  checkingDate?: boolean;
+  showHolidayConfirmation?: boolean;
+  confirmHolidayAndSave?: () => void;
+  dismissHolidayPrompt?: () => void;
 }
 
 export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
@@ -80,6 +87,12 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
   conflictingAppointment,
   onSubmit,
   tutorInputRef,
+
+  dateCheckResult,
+  checkingDate,
+  showHolidayConfirmation,
+  confirmHolidayAndSave,
+  dismissHolidayPrompt,
 }) => {
   if (!isOpen) return null;
 
@@ -92,7 +105,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       aria-labelledby="new-appointment-title"
       className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
     >
-      <div className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto relative">
         {/* Cabeçalho Didático */}
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -106,7 +119,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               Marcar Consulta ou Procedimento
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Siga os passos abaixo. O sistema verificará conflitos e sincronizará no Google Agenda.
+              Siga os passos abaixo. O sistema verificará feriados, conflitos e sincronizará no Google Agenda.
             </p>
           </div>
           <button
@@ -114,7 +127,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
             className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition-colors"
             aria-label="Fechar modal"
           >
-            ✕
+            <i className="ph ph-x text-base"></i>
           </button>
         </div>
 
@@ -151,86 +164,75 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
             <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">
               3
             </span>
-            <span>Horário</span>
+            <span>Data & Hora</span>
           </div>
         </div>
 
-        {/* Alerta de Conflito com Explicação Didática */}
+        {/* Alerta de Erro de Submissão */}
         {errorMessage && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-4 rounded-xl mb-5 shadow-sm">
-            <div className="font-bold flex items-center gap-2 mb-1">
-              <i className="ph ph-warning-circle text-lg text-rose-600"></i>
-              <span>{errorMessage}</span>
+          <div
+            role="alert"
+            className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3.5 rounded-xl mb-4 flex items-start gap-2.5 animate-fadeIn"
+          >
+            <i className="ph-fill ph-warning-circle text-base text-rose-500 shrink-0 mt-0.5"></i>
+            <div>
+              <p className="font-bold">Atenção ao agendar:</p>
+              <p className="mt-0.5">{errorMessage}</p>
+              {conflictingAppointment && (
+                <p className="mt-1 text-[11px] text-rose-600 bg-rose-100/60 p-1.5 rounded-lg">
+                  <strong>Conflito detectado com:</strong> {conflictingAppointment.patientName} (
+                  {conflictingAppointment.procedure}) — Dr(a).{' '}
+                  {conflictingAppointment.veterinarian}
+                </p>
+              )}
             </div>
-            {conflictingAppointment && (
-              <div className="mt-2 text-[11px] bg-white/80 p-2.5 rounded-lg border border-rose-200 text-slate-700">
-                <p>
-                  <strong>Atendimento Conflitante:</strong>{' '}
-                  {new Date(conflictingAppointment.startTime).toLocaleTimeString('pt-BR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}{' '}
-                  às{' '}
-                  {new Date(conflictingAppointment.endTime).toLocaleTimeString('pt-BR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-                <p className="text-slate-500 mt-1">
-                  💡 <strong>Sugestão:</strong> Ajuste o horário para após as{' '}
-                  {new Date(conflictingAppointment.endTime).toLocaleTimeString('pt-BR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}{' '}
-                  ou escolha outro dia.
-                </p>
-              </div>
-            )}
           </div>
         )}
 
         <form onSubmit={onSubmit} className="space-y-4">
-          {/* SEÇÃO 1: TUTOR & PET */}
+          {/* SEÇÃO 1: TUTOR E PACIENTE */}
           <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200/80 space-y-3">
             <div className="relative">
               <div className="flex justify-between items-center mb-1">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <i className="ph ph-user text-emerald-600"></i>
-                  1. Tutor (Cliente Responsável):
+                  1. Tutor Responsável (Cliente):
                 </label>
-                {!selectedClient && (
-                  <button
-                    type="button"
-                    onClick={onOpenNewTutorModal}
-                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer flex items-center gap-1"
-                  >
-                    <i className="ph ph-user-plus"></i> + Novo Tutor
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={onOpenNewTutorModal}
+                  className="text-xs font-bold text-emerald-600 hover:underline cursor-pointer"
+                >
+                  + Cadastrar Novo Tutor
+                </button>
               </div>
 
               {selectedClient ? (
-                <div className="flex items-center justify-between p-3 bg-white border border-emerald-300 rounded-lg text-sm shadow-sm">
+                <div className="flex items-center justify-between p-3 bg-white border border-emerald-300 rounded-xl text-sm shadow-xs">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">
-                      {selectedClient.name[0]}
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                      {selectedClient.name[0].toUpperCase()}
                     </div>
                     <div>
-                      <span className="font-bold text-slate-800 block leading-tight">
+                      <div className="font-bold text-slate-800 leading-tight">
                         {selectedClient.name}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        Tel: {selectedClient.phone} &bull; {selectedClient.email}
-                      </span>
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        Tel: {selectedClient.phone}{' '}
+                        {selectedClient.cpf && `• CPF: ${selectedClient.cpf}`}
+                      </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={onClearTutor}
-                    className="text-xs text-slate-400 hover:text-rose-600 font-bold px-2 py-1 rounded hover:bg-rose-50 transition-colors cursor-pointer"
+                    className="text-xs text-slate-500 hover:text-rose-600 font-bold px-2 py-1 rounded hover:bg-slate-50 transition-colors cursor-pointer"
                     title="Trocar de tutor"
                   >
-                    ✕ Trocar
+                    <span className="flex items-center gap-1">
+                      <i className="ph ph-arrows-clockwise text-xs"></i>
+                      Trocar
+                    </span>
                   </button>
                 </div>
               ) : (
@@ -247,29 +249,30 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
                       onFocus={() => {
                         if (tutorSearchInput.trim().length >= 2) setIsTutorDropdownOpen(true);
                       }}
-                      placeholder="Digite o nome, telefone ou e-mail do tutor..."
-                      className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-8"
+                      placeholder="Digite ao menos 2 letras do nome do tutor..."
+                      className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                     />
-                    <i className="ph ph-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i className="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                   </div>
 
                   {tutorSearchInput.trim().length === 1 && (
-                    <p className="text-[11px] text-slate-400 mt-1">
-                      Digite mais 1 caractere para buscar...
+                    <p className="text-[11px] text-slate-500 mt-1 pl-1 flex items-center gap-1">
+                      <i className="ph ph-info text-xs"></i>
+                      Digite mais 1 letra para ver as recomendações de tutores...
                     </p>
                   )}
 
                   {isTutorDropdownOpen && tutorSearchInput.trim().length >= 2 && (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 divide-y divide-slate-100">
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl max-h-52 overflow-y-auto z-40 divide-y divide-slate-100">
                       {tutorRecommendations.length === 0 ? (
-                        <div className="p-3 text-xs text-slate-400 text-center">
+                        <div className="p-3.5 text-xs text-slate-400 text-center">
                           Nenhum tutor encontrado com &quot;{tutorSearchInput}&quot;.
                           <button
                             type="button"
                             onClick={onOpenNewTutorModal}
-                            className="block mx-auto mt-2 text-xs font-bold text-emerald-600 hover:underline"
+                            className="block mx-auto mt-2 text-emerald-600 font-bold hover:underline"
                           >
-                            + Cadastrar este tutor agora
+                            + Cadastrar &quot;{tutorSearchInput}&quot; agora
                           </button>
                         </div>
                       ) : (
@@ -316,8 +319,9 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               </div>
 
               {!selectedClient ? (
-                <div className="w-full bg-slate-100/80 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-400 italic">
-                  💡 Primeiro selecione um tutor acima para carregar seus animais vinculados.
+                <div className="w-full bg-slate-100/80 border border-slate-200 rounded-lg p-2.5 text-xs text-slate-500 italic flex items-center gap-1.5">
+                  <i className="ph ph-info text-sm text-slate-400"></i>
+                  Primeiro selecione um tutor acima para carregar seus animais vinculados.
                 </div>
               ) : selectedClient.pets.length === 0 ? (
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-between text-xs text-amber-800">
@@ -340,7 +344,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
                   <option value="">Selecione o pet deste tutor...</option>
                   {selectedClient.pets.map((p) => (
                     <option key={p.id} value={p.id}>
-                      🐾 {p.name} ({p.species} &bull; {p.breed} &bull; {p.sex || 'Sexo ñ inf.'})
+                      {p.name} ({p.species} &bull; {p.breed} &bull; {p.sex || 'Sexo não informado'})
                     </option>
                   ))}
                 </select>
@@ -447,6 +451,34 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               </div>
             </div>
 
+            {/* Alerta de Feriado e Horário Especial (Google Calendar / MedPet) */}
+            {checkingDate ? (
+              <div className="flex items-center gap-2 text-[11px] text-slate-500 py-1">
+                <i className="ph ph-spinner animate-spin text-emerald-600"></i>
+                <span>Verificando feriados e expediente no Google Agenda...</span>
+              </div>
+            ) : (
+              dateCheckResult && dateCheckResult.hasWarning && (
+                <div className="bg-amber-50/90 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 animate-fadeIn space-y-1.5 shadow-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-800">
+                    <i className="ph-fill ph-warning-circle text-base text-amber-600"></i>
+                    <span>Aviso de Calendário e Expediente:</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-1 pl-1 text-[11px] leading-relaxed">
+                    {dateCheckResult.warnings.map((w, idx) => (
+                      <li key={idx}>{w}</li>
+                    ))}
+                  </ul>
+                  {dateCheckResult.isHoliday && (
+                    <div className="flex items-center gap-1 text-[10px] text-amber-700 italic pt-0.5">
+                      <i className="ph ph-google-logo"></i>
+                      <span>Sincronizado com a base oficial de Feriados Nacionais do Google Calendar.</span>
+                    </div>
+                  )}
+                </div>
+              )
+            )}
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                 Veterinário Responsável:
@@ -506,6 +538,58 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
             </button>
           </div>
         </form>
+
+        {/* DIÁLOGO MODAL DE CONFIRMAÇÃO EM FERIADO / HORÁRIO ESPECIAL */}
+        {showHolidayConfirmation && dateCheckResult && (
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            className="fixed inset-0 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4 z-60 animate-fadeIn"
+          >
+            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-200">
+              <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3">
+                <i className="ph-fill ph-calendar-x text-2xl"></i>
+              </div>
+              <h4 className="text-base font-bold text-slate-800 text-center">
+                {dateCheckResult.isHoliday
+                  ? `Agendamento no Feriado: ${dateCheckResult.holidayName || 'Feriado'}`
+                  : 'Agendamento em Horário Especial'}
+              </h4>
+              <div className="bg-amber-50 rounded-xl p-3.5 my-3.5 text-xs text-amber-900 space-y-1.5">
+                {dateCheckResult.warnings.map((w, i) => (
+                  <p key={i} className="leading-relaxed">
+                    {w}
+                  </p>
+                ))}
+                <p className="font-semibold pt-1 text-slate-700">
+                  Deseja realmente confirmar esta consulta como exceção / emergência?
+                </p>
+              </div>
+              <div className="flex justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={dismissHolidayPrompt}
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer transition-colors"
+                >
+                  Corrigir Data / Horário
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmHolidayAndSave}
+                  disabled={submitting}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+                >
+                  {submitting ? (
+                    <i className="ph ph-spinner animate-spin text-sm"></i>
+                  ) : (
+                    <i className="ph ph-check text-sm"></i>
+                  )}
+                  Sim, Confirmar Agendamento
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

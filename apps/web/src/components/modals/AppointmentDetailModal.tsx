@@ -58,7 +58,7 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
             className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition-colors"
             aria-label="Fechar modal"
           >
-            ✕
+            <i className="ph ph-x text-base"></i>
           </button>
         </div>
 
@@ -123,7 +123,10 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
               onClick={() => onUpdateStatus(appointment.id, 'CONFIRMADO')}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer transition-colors shadow-sm shadow-emerald-600/20"
             >
-              ✓ Confirmar Presença
+              <span className="flex items-center gap-1.5">
+                <i className="ph ph-check text-xs"></i>
+                Confirmar Presença
+              </span>
             </button>
           )}
 
@@ -133,7 +136,10 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                 onClick={() => onUpdateStatus(appointment.id, 'EM_ATENDIMENTO')}
                 className="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer transition-colors shadow-sm shadow-amber-500/20"
               >
-                🩺 Iniciar Atendimento
+                <span className="flex items-center gap-1.5">
+                  <i className="ph ph-play text-xs"></i>
+                  Iniciar Atendimento
+                </span>
               </button>
               <button
                 onClick={() => onUpdateStatus(appointment.id, 'NAO_COMPARECEU')}
@@ -149,7 +155,10 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
               onClick={() => onUpdateStatus(appointment.id, 'CONCLUIDO')}
               className="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-5 py-2 rounded-lg cursor-pointer transition-colors shadow-sm"
             >
-              ✓ Finalizar Atendimento
+              <span className="flex items-center gap-1.5">
+                <i className="ph ph-check-circle text-xs"></i>
+                Finalizar Atendimento
+              </span>
             </button>
           )}
 

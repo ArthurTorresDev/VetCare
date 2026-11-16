@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
@@ -164,6 +164,7 @@ export default function VetCareDashboard() {
               loading={initialLoading}
               displayMode={displayMode}
               appointments={filteredAppointments}
+              services={services}
               gridDays={gridDays}
               periodFilter={periodFilter}
               appointmentsByDateHour={appointmentsByDateHour}
@@ -266,6 +267,11 @@ export default function VetCareDashboard() {
         conflictingAppointment={scheduleForm.conflictingAppointment}
         onSubmit={scheduleForm.handleSubmit}
         tutorInputRef={scheduleForm.tutorInputRef}
+        dateCheckResult={scheduleForm.dateCheckResult}
+        checkingDate={scheduleForm.checkingDate}
+        showHolidayConfirmation={scheduleForm.showHolidayConfirmation}
+        confirmHolidayAndSave={scheduleForm.confirmHolidayAndSave}
+        dismissHolidayPrompt={scheduleForm.dismissHolidayPrompt}
       />
 
       {/* 3. Novo Tutor */}

@@ -29,14 +29,18 @@ export const CancelledTab: React.FC<CancelledTabProps> = ({
           className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-rose-500 p-5 shadow-sm opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
         >
           <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full">
-              ✕ Cancelado
+            <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <i className="ph ph-x-circle text-xs"></i>
+              Cancelado
             </span>
             <span className="text-xs text-slate-400">
               Data: {formatDateBR(appt.startTime)}
             </span>
           </div>
-          <h3 className="font-bold text-slate-800 text-base">🐾 {appt.petName}</h3>
+          <h3 className="font-bold text-slate-800 text-base flex items-center gap-1.5">
+            <i className="ph ph-paw-print text-sm text-slate-500"></i>
+            {appt.petName}
+          </h3>
           <p className="text-xs text-slate-500">Tutor: {appt.clientName}</p>
           <p className="text-xs text-slate-600 mt-2">{appt.serviceName}</p>
         </div>

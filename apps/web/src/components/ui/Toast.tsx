@@ -62,7 +62,7 @@ export const ToastContainer: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
               className="text-slate-400 hover:text-white p-1 rounded-md transition-colors"
               aria-label="Fechar notificação"
             >
-              ✕
+              <i className="ph ph-x text-sm"></i>
             </button>
           </div>
         );

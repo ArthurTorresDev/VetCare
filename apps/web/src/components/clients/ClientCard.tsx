@@ -115,8 +115,9 @@ export const ClientCard: React.FC<ClientCardProps> = ({
 
                   <div className="flex items-center gap-1 text-[10px] text-slate-400">
                     {p.sex && (
-                      <span className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-medium">
-                        {p.sex === 'Macho' ? '♂ M' : '♀ F'}
+                      <span className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-medium flex items-center gap-1">
+                        <i className={`ph ${p.sex === 'Macho' ? 'ph-gender-male' : 'ph-gender-female'} text-xs`}></i>
+                        {p.sex === 'Macho' ? 'M' : 'F'}
                       </span>
                     )}
                     {p.weightKg && (

@@ -119,22 +119,22 @@ export const GOOGLE_SYNC_STATUS_CONFIG: Record<
   SYNCED: {
     label: 'Sincronizado no Google Agenda',
     badgeColor: '#10b981',
-    icon: '✓',
+    icon: 'ph-check-circle',
   },
   MOCKED: {
     label: 'Google Agenda (Modo Simulado)',
     badgeColor: '#3b82f6',
-    icon: '⚡',
+    icon: 'ph-lightning',
   },
   PENDING: {
     label: 'Sincronização Pendente',
     badgeColor: '#f59e0b',
-    icon: '⏳',
+    icon: 'ph-hourglass',
   },
   FAILED: {
     label: 'Falha na Sincronização Google',
     badgeColor: '#ef4444',
-    icon: '✕',
+    icon: 'ph-x-circle',
   },
 };
 

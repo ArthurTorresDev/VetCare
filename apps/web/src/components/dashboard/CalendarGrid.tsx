@@ -107,7 +107,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                           className={`rounded-lg p-2 text-xs border ${style.bannerBg} hover:shadow-md transition-shadow cursor-pointer mb-1`}
                         >
                           <div className="font-bold flex items-center justify-between">
-                            <span>🐾 {a.petName}</span>
+                            <span className="flex items-center gap-1.5">
+                              <i className="ph ph-paw-print text-[11px]"></i>
+                              {a.petName}
+                            </span>
                             <span className="text-[10px] font-medium opacity-80">
                               {formatTimeBR(a.startTime)}
                             </span>

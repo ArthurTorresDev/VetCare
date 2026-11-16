@@ -1,4 +1,4 @@
-# 📘 Documentação Arquitetural Completa — VetCare (MedPet)
+# Documentação Arquitetural Completa — VetCare (MedPet)
 
 > **Versão do Sistema:** 2.0.0 (Modular Monorepo)  
 > **Classificação:** Documentação Técnica de Arquitetura e Engenharia de Software  

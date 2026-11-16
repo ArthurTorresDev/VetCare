@@ -64,7 +64,10 @@ export const ServicesTab: React.FC<ServicesTabProps> = ({
                   }`}
                   title="Clique para alternar situação ativo/inativo"
                 >
-                  {s.isActive ? '✓ Ativo' : '✕ Inativo'}
+                  <span className="flex items-center gap-1">
+                    <i className={`ph ${s.isActive ? 'ph-check' : 'ph-x'} text-xs`}></i>
+                    {s.isActive ? 'Ativo' : 'Inativo'}
+                  </span>
                 </button>
               </div>
 

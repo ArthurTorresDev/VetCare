@@ -31,11 +31,14 @@ export const DidacticTipBanner: React.FC = () => {
 
       <button
         onClick={() => setIsDismissed(true)}
-        className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-white/60 transition-colors text-xs font-semibold cursor-pointer shrink-0"
+        className="text-slate-500 hover:text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-white transition-colors text-xs font-semibold cursor-pointer shrink-0"
         title="Dispensar dica"
         aria-label="Dispensar dica"
       >
-        ✕ Entendido
+        <span className="flex items-center gap-1">
+          <i className="ph ph-check text-xs"></i>
+          Entendido
+        </span>
       </button>
     </div>
   );

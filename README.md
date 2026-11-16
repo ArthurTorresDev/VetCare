@@ -4,14 +4,14 @@ Plataforma integrada de gestão clínica, agendamento de consultas com integraç
 
 ---
 
-## 📚 Documentação Técnica de Arquitetura
+## Documentacao Tecnica de Arquitetura
 
 A especificação arquitetural completa, diagramas e detalhes de engenharia de software estão disponíveis em:
 - **[docs/ARCHITECTURE.md](file:///c:/Users/arthu/OneDrive/Desktop/Arthur%20Steiner/Projetos/Pessoais/VetCare/docs/ARCHITECTURE.md)**
 
 ---
 
-## 🏛️ Topologia e Padrão MVC
+## Topologia e Padrao MVC
 
 O projeto é estruturado em um monorepo gerenciado por **Turborepo** e **npm workspaces**:
 
@@ -34,7 +34,7 @@ O projeto é estruturado em um monorepo gerenciado por **Turborepo** e **npm wor
 
 ---
 
-## 🚀 Como Executar
+## Como Executar
 
 ### 1. Pré-requisitos
 - Node.js >= 18.0.0

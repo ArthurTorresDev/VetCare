@@ -69,13 +69,14 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center cursor-pointer transition-colors"
           >
-            ✕
+            <i className="ph ph-x text-base"></i>
           </button>
         </div>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-lg mb-3">
-            ⚠️ {error}
+          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-lg mb-3 flex items-center gap-1.5">
+            <i className="ph ph-warning-circle text-base text-rose-500 shrink-0"></i>
+            <span>{error}</span>
           </div>
         )}
 
