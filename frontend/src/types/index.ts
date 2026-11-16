@@ -11,8 +11,7 @@ export type TabType =
   | 'CONSULTAS_REALIZADAS'
   | 'CANCELADAS'
   | 'RELATORIOS'
-  | 'HISTORICO'
-  | 'NOTIFICACOES';
+  | 'HISTORICO';
 
 export type DisplayMode = 'CARDS' | 'CALENDAR_WEEK';
 

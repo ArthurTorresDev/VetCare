@@ -133,15 +133,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
               onClick={() => {
-                setActiveTab('NOTIFICACOES');
-                setIsProfileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
-            >
-              Notificações Disparadas
-            </button>
-            <button
-              onClick={() => {
                 window.open(getExportXmlUrl(), '_blank');
                 setIsProfileMenuOpen(false);
               }}

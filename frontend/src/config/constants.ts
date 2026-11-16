@@ -10,7 +10,6 @@ export const TAB_LABELS: Record<TabType, string> = {
   CANCELADAS: 'Agendamentos Cancelados',
   RELATORIOS: 'Exportação de Registros (XML)',
   HISTORICO: 'Histórico & Auditoria de Operações',
-  NOTIFICACOES: 'Notificações por E-mail',
 };
 
 export const TAB_SUBTITLES: Record<TabType, string> = {
@@ -21,7 +20,6 @@ export const TAB_SUBTITLES: Record<TabType, string> = {
   CANCELADAS: 'Registro e auditoria de cancelamentos e desistências de consultas.',
   RELATORIOS: 'Exportação de prontuários e agendamentos em formato XML estruturado.',
   HISTORICO: 'Rastreabilidade de todas as ações e alterações efetuadas no sistema.',
-  NOTIFICACOES: 'Registro das notificações automáticas enviadas aos tutores.',
 };
 
 export const VETS_LIST = [

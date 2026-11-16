@@ -85,18 +85,6 @@ export const NewTutorModal: React.FC<NewTutorModalProps> = ({
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-700">E-mail para Notificações:</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tutor@exemplo.com"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1"
-            />
-          </div>
-
-          <div>
             <label className="text-xs font-semibold text-slate-700">CPF (Opcional):</label>
             <input
               type="text"

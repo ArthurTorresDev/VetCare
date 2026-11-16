@@ -17,7 +17,6 @@ const NAV_ITEMS: [TabType, string, string][] = [
   ['CANCELADAS', 'ph-calendar-x', 'Canceladas'],
   ['RELATORIOS', 'ph-chart-line-up', 'Relatórios XML'],
   ['HISTORICO', 'ph-clock-counter-clockwise', 'Auditoria'],
-  ['NOTIFICACOES', 'ph-envelope-simple', 'Notificações'],
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
