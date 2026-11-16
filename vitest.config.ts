@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       reporter: ['text', 'html'],
-      include: ['apps/**/*.ts', 'packages/**/*.ts'],
+      include: ['backend/**/*.ts', 'packages/**/*.ts', 'frontend/**/*.ts'],
     },
   },
 });

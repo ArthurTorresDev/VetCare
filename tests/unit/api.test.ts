@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { AppointmentRepository } from '../../apps/api/src/appointment.repository';
-import { MockGoogleCalendarService } from '../../apps/api/src/google-calendar.service';
+import { AppointmentRepository } from '../../backend/src/appointment.repository';
+import { MockGoogleCalendarService } from '../../backend/src/google-calendar.service';
 import {
   calculateEndTime,
   formatGoogleCalendarEventPayload,

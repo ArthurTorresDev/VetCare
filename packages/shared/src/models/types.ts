@@ -139,11 +139,77 @@ export interface AppointmentDetailedView extends Appointment {
 export interface AuditLogEntry {
   id: string;
   timestamp: string;
-  action: 'CREATE' | 'UPDATE_STATUS' | 'RESCHEDULE' | 'CANCEL' | 'SYNC_GCAL';
+  action: 'CREATE' | 'UPDATE_STATUS' | 'RESCHEDULE' | 'CANCEL' | 'SYNC_GCAL' | 'REGISTER' | 'LOGIN' | 'LOGOUT' | 'PASSWORD_CHANGE' | 'ACCOUNT_DELETE';
   targetId: string;
-  targetType: 'APPOINTMENT' | 'CLIENT' | 'PET' | 'SERVICE';
+  targetType: 'APPOINTMENT' | 'CLIENT' | 'PET' | 'SERVICE' | 'USER' | 'AUTH';
   user: string;
   details: string;
+}
+
+// ─── Autenticação e Gestão de Usuários ─────────────────────────────────────────
+
+export type UserRole = 'ADMIN' | 'VET' | 'RECEPTIONIST' | 'CLIENT';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  phone?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
+}
+
+export type PublicUser = Omit<User, 'passwordHash'>;
+
+export interface RegisterUserDTO {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  phone?: string;
+  role?: UserRole;
+}
+
+export interface LoginDTO {
+  email: string;
+  password: string;
+}
+
+export interface UpdateUserDTO {
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface ChangePasswordDTO {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword?: string;
+}
+
+export interface DeleteAccountDTO {
+  password: string;
+  confirmation: string;
+}
+
+export interface AuthResponse {
+  user: PublicUser;
+  token: string;
+  expiresIn: string;
+  tokenType: 'Bearer';
+}
+
+export interface TokenPayload {
+  sub: string;
+  email: string;
+  role: UserRole;
+  jti: string;
+  iat: number;
+  exp: number;
 }
 
 export type NotificationType =

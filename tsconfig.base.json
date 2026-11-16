@@ -14,7 +14,11 @@
     "paths": {
       "@vetcare/shared": ["packages/shared/src"],
       "@vetcare/ui": ["packages/ui/src"],
-      "@vetcare/*": ["apps/*/src"]
+      "@vetcare/backend": ["backend/src"],
+      "@vetcare/backend/*": ["backend/src/*"],
+      "@vetcare/frontend": ["frontend/src"],
+      "@vetcare/frontend/*": ["frontend/src/*"],
+      "@vetcare/*": ["packages/*/src", "backend/src", "frontend/src"]
     }
   }
 }

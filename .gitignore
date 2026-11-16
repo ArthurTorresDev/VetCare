@@ -9,6 +9,7 @@ build/
 out/
 .next/
 .turbo/
+<<<<<<< Updated upstream
 .vite/
 *.tsbuildinfo
 

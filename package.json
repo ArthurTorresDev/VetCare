@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "packageManager": "npm@10.9.2",
   "workspaces": [
-    "apps/*",
+    "backend",
+    "frontend",
     "packages/*"
   ],
   "scripts": {
@@ -33,5 +34,8 @@
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "googleapis": "^190.0.0"
   }
 }

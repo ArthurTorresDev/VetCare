@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { HolidayService } from '../../apps/api/src/domain/services/holiday.service';
+import { HolidayService } from '../../backend/src/services/holiday.service';
 
 describe('Serviço de Feriados e Expediente MedPet (HolidayService)', () => {
   const service = new HolidayService();
