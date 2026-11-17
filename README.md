@@ -9,8 +9,6 @@ Sistema de gestão veterinária e agendamento clínico, desenvolvido para facili
 - 📅 Agendamento e gerenciamento de consultas.
 - 🐶 Cadastro e gerenciamento de tutores e animais.
 - 🩺 Catálogo de serviços e procedimentos veterinários.
-- 📆 Integração com Google Calendar.
-- 📧 Sistema de notificações por e-mail.
 - 📋 Auditoria operacional e exportação de registros em XML.
 
 ## 🏗️ Arquitetura
