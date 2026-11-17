@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@vetcare/shared": ["packages/shared/src"],
+      "@vetcare/ui": ["packages/ui/src"],
+      "@vetcare/backend": ["backend/src"],
+      "@vetcare/backend/*": ["backend/src/*"],
+      "@vetcare/frontend": ["frontend/src"],
+      "@vetcare/frontend/*": ["frontend/src/*"],
+      "@vetcare/*": ["packages/*/src", "backend/src", "frontend/src"]
+    }
+  }
+}
