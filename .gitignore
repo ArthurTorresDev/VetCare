@@ -107,3 +107,4 @@ desktop.ini
 # 8. Documentos Internos / Regras de Negócio
 # ==========================================
 Regras de Negócio/
+sync-branches.sh
