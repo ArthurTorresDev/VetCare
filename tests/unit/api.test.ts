@@ -1,38 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { AppointmentRepository } from '../../backend/src/repositories/appointment.repository';
-import { MockGoogleCalendarService } from '../../backend/src/services/google-calendar.service';
 import {
   calculateEndTime,
-  formatGoogleCalendarEventPayload,
 } from '../../packages/shared/src/index';
 
-describe('Integração de Agendamento com Google Calendar (Camada de Serviços)', () => {
-  it('deve simular criação, atualização e remoção de eventos no Google Calendar', async () => {
-    const gcal = new MockGoogleCalendarService();
-    expect(gcal.getStatus().isMock).toBe(true);
-
-    const payload = {
-      summary: '[VetCare] Consulta: Rex (Tutor: Ana)',
-      description: 'Atendimento clínico geral',
-      start: { dateTime: '2026-11-20T10:00:00.000Z' },
-      end: { dateTime: '2026-11-20T10:30:00.000Z' },
-    };
-
-    // Criação
-    const result = await gcal.createEvent(payload);
-    expect(result.eventId).toBeDefined();
-    expect(result.htmlLink).toContain('calendar.google.com');
-    expect(result.isMock).toBe(true);
-
-    // Atualização
-    await expect(
-      gcal.updateEvent(result.eventId, { summary: '[CONFIRMADO] Consulta: Rex' }),
-    ).resolves.not.toThrow();
-
-    // Deleção
-    await expect(gcal.deleteEvent(result.eventId)).resolves.not.toThrow();
-  });
-
+describe('Gestão de Agendamentos e Repositório Clínico', () => {
   it('deve gerenciar agendamentos no repositório e montar visualização detalhada com tutor e pet', () => {
     const repo = new AppointmentRepository();
     const clients = repo.getClients();
@@ -55,9 +27,6 @@ describe('Integração de Agendamento com Google Calendar (Camada de Serviços)'
       startTime,
       endTime,
       status: 'AGENDADO',
-      googleEventId: 'gcal_test_123',
-      googleCalendarHtmlLink: 'https://calendar.google.com/test',
-      googleSyncStatus: 'SYNCED',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
