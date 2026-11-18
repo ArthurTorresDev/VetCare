@@ -12,7 +12,7 @@ export const ReportsTab: React.FC = () => {
       <h2 className="text-xl font-bold text-slate-800">Exportação em XML Estruturado</h2>
       <p className="text-slate-500 text-sm mt-1 mb-6">
         Faça o download do arquivo XML contendo todos os registros de agendamentos, dados de
-        tutores, histórico de pacientes e sincronização do Google Calendar conforme os padrões
+        tutores, histórico de pacientes conforme os padrões
         da clínica MedPet.
       </p>
       <button

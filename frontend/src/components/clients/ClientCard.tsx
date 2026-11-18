@@ -146,7 +146,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
           onClick={() => onScheduleForClient(client)}
           className="text-xs font-bold text-slate-700 hover:text-emerald-600 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors cursor-pointer"
         >
-          <i className="ph ph-calendar-plus text-sm text-emerald-600"></i> Agendar Atendimento
+          <i className="ph ph-Calendario-plus text-sm text-emerald-600"></i> Agendar Atendimento
         </button>
       </div>
     </div>

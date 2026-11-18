@@ -17,7 +17,7 @@ interface FilterToolbarProps {
 
 const STATUS_OPTIONS: { key: AppointmentStatus | 'TODOS'; label: string; icon: string }[] = [
   { key: 'TODOS', label: 'Todos', icon: 'ph-list' },
-  { key: 'AGENDADO', label: 'Agendados', icon: 'ph-calendar' },
+  { key: 'AGENDADO', label: 'Agendados', icon: 'ph-Calendario' },
   { key: 'CONFIRMADO', label: 'Confirmados', icon: 'ph-check-circle' },
   { key: 'EM_ATENDIMENTO', label: 'No Consultório', icon: 'ph-stethoscope' },
   { key: 'CONCLUIDO', label: 'Concluídos', icon: 'ph-seal-check' },

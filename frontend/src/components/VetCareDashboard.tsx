@@ -5,9 +5,10 @@ import {
   AuditLogEntry,
   EmailNotification,
 } from '@vetcare/shared';
-import { TabType, GoogleStatusResponse } from '../types/index';
+import { TabType } from '../types/index';
 import { TAB_LABELS, TAB_SUBTITLES } from '../config/constants';
 import { loadInitialAppData } from '../services/api.service';
+import { HolidayItem } from '../services/holiday.service';
 
 // Hooks (Controllers)
 import { useAppointments } from '../hooks/useAppointments';
@@ -40,7 +41,7 @@ import { ServiceModal } from './modals/ServiceModal';
 export default function VetCareDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('DASHBOARD');
   const [searchQuery, setSearchQuery] = useState('');
-  const [googleStatus, setGoogleStatus] = useState<GoogleStatusResponse | null>(null);
+  const [holidays, setHolidays] = useState<HolidayItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [notifications, setNotifications] = useState<EmailNotification[]>([]);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
@@ -87,7 +88,7 @@ export default function VetCareDashboard() {
       setServices(data.services);
       setAuditLogs(data.auditLogs);
       setNotifications(data.notifications);
-      setGoogleStatus(data.googleStatus);
+      setHolidays(data.holidays || []);
     } catch (err) {
       console.error('[VetCare Init Error]', err);
     } finally {
@@ -129,7 +130,6 @@ export default function VetCareDashboard() {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        googleStatus={googleStatus}
       />
 
       {/* ÁREA PRINCIPAL */}
@@ -145,7 +145,6 @@ export default function VetCareDashboard() {
           displayMode={displayMode}
           setDisplayMode={setDisplayMode}
           onOpenNewAppointmentModal={() => scheduleForm.openModal()}
-          googleStatus={googleStatus}
         />
 
         {/* CONTEÚDO PRINCIPAL DA ABA */}
@@ -168,6 +167,7 @@ export default function VetCareDashboard() {
               gridDays={gridDays}
               periodFilter={periodFilter}
               appointmentsByDateHour={appointmentsByDateHour}
+              holidays={holidays}
               onSelectAppointment={(a) => setSelectedAppointment(a)}
               onSelectSlot={(dateIso, hour) => scheduleForm.openModal(dateIso, hour)}
               onOpenNewAppointmentModal={() => scheduleForm.openModal()}

@@ -13,7 +13,7 @@ O **VetCare** (sistema interno MedPet) é uma plataforma web para gestão clíni
 
 ### Objetivos Primordiais
 1. **Centralização Operacional:** Eliminar o uso disperso de cadernos, planilhas e mensagens de texto, consolidando clientes, animais, catálogo de procedimentos e auditoria em uma base consistente.
-2. **Agendamento Inteligente & Google Calendar:** Permitir o agendamento de consultas com checagem automática de sobreposição de horários e sincronização com o Google Agenda.
+2. **Agendamento Inteligente & Google Calendario:** Permitir o agendamento de consultas com checagem automática de sobreposição de horários e sincronização com o Google Agenda.
 3. **Relacionamento Estrito Tutor-Paciente:** Garantir que animais pertençam com integridade referencial a seus respectivos tutores, impedindo vínculos incorretos.
 4. **Resiliência e Desacoplamento (MVC):** Aplicação das regras de negócio puras em pacotes compartilhados, separando controladores, camada de persistência e interfaces visuais.
 
@@ -32,7 +32,7 @@ graph TD
         end
 
         subgraph Packages ["Camada de Pacotes Compartilhados (/packages)"]
-            SHARED["packages/shared (Domain Models, Business Rules, DTOs, Calendar utils)"]
+            SHARED["packages/shared (Domain Models, Business Rules, DTOs, Calendario utils)"]
             UI["packages/ui (Design Tokens, Clinical Constants, Formatters)"]
         end
     end
@@ -42,7 +42,7 @@ graph TD
     WEB -- "HTTP REST /api" --> API
     API --> SHARED
     API --> UI
-    API -- "Google Calendar API / OAuth2" --> GCAL["Google Calendar Service (Live / Mock)"]
+    API -- "Google Calendario API / OAuth2" --> GCAL["Google Calendario Service (Live / Mock)"]
 ```
 
 ### Detalhamento dos Módulos
@@ -74,7 +74,7 @@ sequenceDiagram
     participant Service as Domain Service Layer
     participant Repo as Repository Layer
     participant Store as In-Memory Store / Data Source
-    participant GCal as Google Calendar Integration
+    participant GCal as Google Calendario Integration
 
     Atendente->>Route: POST /api/appointments
     Route->>Middleware: Interceptação e Sanitização
@@ -113,12 +113,12 @@ graph LR
     subgraph Model ["Model (Camada de Dados & API)"]
         M1["services/*.service.ts"]
         M2["api.service.ts (HTTP Fetch wrapper)"]
-        M3["packages/shared (Types, Rules & Calendar Utils)"]
+        M3["packages/shared (Types, Rules & Calendario Utils)"]
     end
 
     subgraph Controller ["Controller (Lógica de Apresentação & Estado)"]
         C1["hooks/useAppointments.ts"]
-        C2["hooks/useCalendarView.ts"]
+        C2["hooks/useCalendarioView.ts"]
         C3["hooks/useClients.ts"]
         C4["hooks/useScheduleForm.ts"]
         C5["hooks/useServiceCatalog.ts"]
@@ -126,7 +126,7 @@ graph LR
 
     subgraph View ["View (Componentes Visuais Puros)"]
         V1["components/layout (Header, Sidebar)"]
-        V2["components/dashboard (CalendarGrid, AppointmentCard)"]
+        V2["components/dashboard (CalendarioGrid, AppointmentCard)"]
         V3["components/modals (NewAppointment, Detail, Tutor, Pet)"]
         V4["components/tabs (Dashboard, Clients, Completed, Reports)"]
     end
@@ -152,7 +152,7 @@ A visualização do calendário conta com adaptação dinâmica de colunas confo
 | Filtro | Descrição Técnica | Total de Colunas Geradas | Comportamento na Grade |
 | :--- | :--- | :--- | :--- |
 | **Hoje (`HOJE`)** | Retorna o dia corrente com hora zerada (`00:00:00`). | 1 dia + 1 coluna HORA (2 colunas) | Foco intensivo nos compromissos do dia. |
-| **Esta Semana (`SEMANA`)** | Calcula o domingo anterior (`d.getDate() - d.getDay()`) e gera 7 dias consecutivos. | 7 dias + 1 coluna HORA (8 colunas) | Padrão estilo Google Calendar / VetPal com grade horária. |
+| **Esta Semana (`SEMANA`)** | Calcula o domingo anterior (`d.getDate() - d.getDay()`) e gera 7 dias consecutivos. | 7 dias + 1 coluna HORA (8 colunas) | Padrão estilo Google Calendario / VetPal com grade horária. |
 | **Este Mês (`MES`)** | Obtém o dia 1 do mês e itera até o total de dias do mês (`new Date(y, m+1, 0).getDate()`). | 28 a 31 dias + 1 coluna HORA | Panorama completo dos dias do mês atual. |
 | **Este Ano (`ANO`)** | Itera de 0 a 11 gerando o primeiro dia de cada mês do ano de referência. | 12 meses + 1 coluna HORA (13 colunas) | Visão executiva anual condensada. |
 
@@ -183,7 +183,7 @@ flowchart TD
     P -- Sim --> Q[Retorna aviso de conflito com agendamento existente]
     P -- Não --> R[Persiste agendamento no Repositório]
     R --> S[Auditoria registra ação CREATE]
-    R --> T[Envia evento à API Google Calendar]
+    R --> T[Envia evento à API Google Calendario]
     R --> U[Agenda notificação de confirmação por e-mail]
     U --> V([Fim: Agendamento confirmado e interface atualizada])
 ```
@@ -221,9 +221,9 @@ Cada transição de estado registra imediatamente um evento imutável na tabela 
 
 ## 5. Integrações Externas
 
-### 5.1. Google Calendar Integration
+### 5.1. Google Calendario Integration
 - **Mecanismo:** A API utiliza a biblioteca oficial `googleapis` conectada via OAuth2 ou Service Account.
-- **Modo Resiliente (Simulator / Mock):** Caso as credenciais não estejam presentes no `.env`, o sistema comuta automaticamente para o modo simulador, gerando links web válidos do Google Calendar (`https://calendar.google.com/calendar/r/eventedit?...`) sem interromper a rotina da clínica.
+- **Modo Resiliente (Simulator / Mock):** Caso as credenciais não estejam presentes no `.env`, o sistema comuta automaticamente para o modo simulador, gerando links web válidos do Google Calendario (`https://Calendario.google.com/Calendario/r/eventedit?...`) sem interromper a rotina da clínica.
 - **Sincronização:** Envio de resumo padronizado, descrição com tags para identificação do animal, tutor e ID do sistema interno.
 
 ### 5.2. Motor de Notificações por E-mail

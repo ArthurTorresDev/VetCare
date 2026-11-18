@@ -21,8 +21,6 @@ export const DidacticTipBanner: React.FC = () => {
             • <strong>Agendamento Rápido:</strong> Clique em qualquer horário vazio na visualização{' '}
             <span className="font-semibold text-emerald-700">Grade</span> para abrir o formulário
             com o dia e hora já preenchidos.
-            <br />• <strong>Sincronização:</strong> Todos os compromissos criados são espelhados
-            automaticamente no <strong>Google Calendar</strong>.
             <br />• <strong>Proteção de Conflito:</strong> O sistema detecta sobreposição de horários
             e avisa antes de salvar para evitar atendimentos duplicados.
           </p>

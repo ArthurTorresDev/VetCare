@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '../context/index';
 
 export const metadata: Metadata = {
   title: 'VetCare / MedPet',
@@ -37,7 +38,7 @@ export default function RootLayout({
       </head>
 
       <body className="text-slate-800 antialiased bg-slate-50">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

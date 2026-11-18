@@ -17,7 +17,7 @@ export const KPIStatsOverview: React.FC<KPIStatsOverviewProps> = ({ stats }) => 
             Hoje
           </span>
           <span className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-lg">
-            <i className="ph ph-calendar-check"></i>
+            <i className="ph ph-Calendario-check"></i>
           </span>
         </div>
         <p className="text-2xl font-bold text-slate-800">{stats.totalToday}</p>

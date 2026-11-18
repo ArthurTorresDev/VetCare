@@ -1,14 +1,58 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../context/index';
+import { registerUser } from '../../services/auth.service';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login, setUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [notice, setNotice] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  // Campos de formulário
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setNotice('A autenticação ainda não está conectada ao servidor.');
+    setNotice('');
+    setIsError(false);
+    setIsSubmitting(true);
+
+    try {
+      if (isRegisterMode) {
+        const result = await registerUser({
+          name,
+          email,
+          password,
+          confirmPassword: password,
+          phone,
+          role: 'RECEPTIONIST',
+        });
+        setUser(result.user);
+        router.replace('/');
+        return;
+      }
+
+      await login(email, password);
+      setNotice('Autenticado com sucesso! Entrando...');
+
+      setTimeout(() => {
+        router.replace('/');
+      }, 700);
+    } catch (err: any) {
+      setIsError(true);
+      setNotice(err.message || 'Falha ao processar solicitação.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -56,7 +100,7 @@ export default function LoginPage() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-2xl font-bold tracking-tight text-slate-900">
-                    Med<span className="text-[#00ba7c]">Pet</span>
+                    Vet<span className="text-[#00ba7c]">Care</span>
                   </span>
                   <span
                     className="material-symbols-outlined text-sm font-bold text-[#0a5f7a]"
@@ -75,14 +119,73 @@ export default function LoginPage() {
           <div className="my-auto py-6">
             <header className="mb-6">
               <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 lg:text-3xl">
-                Acesso ao Sistema
+                {isRegisterMode ? 'Criar Nova Conta' : 'Acesso ao Sistema'}
               </h1>
               <p className="mt-1.5 text-sm font-normal text-slate-500">
-                Acesse o prontuário eletrônico e a rotina clínica
+                {isRegisterMode
+                  ? 'Cadastre-se na equipe clínica MedPet'
+                  : 'Acesse o prontuário eletrônico e a rotina clínica'}
               </p>
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {isRegisterMode && (
+                <>
+                  <div>
+                    <label
+                      htmlFor="register-name"
+                      className="mb-1.5 ml-1 block text-xs font-semibold text-slate-600"
+                    >
+                      Nome completo <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div
+                        className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
+                        aria-hidden="true"
+                      >
+                        <span className="material-symbols-outlined text-[19px] leading-none">person</span>
+                      </div>
+                      <input
+                        id="register-name"
+                        name="name"
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Ex: Dra. Camila Rocha"
+                        className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="register-phone"
+                      className="mb-1.5 ml-1 block text-xs font-semibold text-slate-600"
+                    >
+                      Telefone / WhatsApp
+                    </label>
+                    <div className="relative">
+                      <div
+                        className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
+                        aria-hidden="true"
+                      >
+                        <span className="material-symbols-outlined text-[19px] leading-none">call</span>
+                      </div>
+                      <input
+                        id="register-phone"
+                        name="phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(11) 98765-4321"
+                        className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div>
                 <label
                   htmlFor="login-email"
@@ -103,6 +206,8 @@ export default function LoginPage() {
                     type="email"
                     autoComplete="username"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="exemplo@medpet.com.br"
                     className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
                   />
@@ -117,13 +222,15 @@ export default function LoginPage() {
                   >
                     Senha de acesso <span className="text-rose-500">*</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setNotice('A recuperação de senha ainda não está disponível.')}
-                    className="text-xs font-semibold text-[#0a5f7a] transition-colors hover:text-[#00ba7c]"
-                  >
-                    Esqueceu sua senha?
-                  </button>
+                  {!isRegisterMode && (
+                    <button
+                      type="button"
+                      onClick={() => setNotice('A redefinição de senha pode ser solicitada à administração.')}
+                      className="text-xs font-semibold text-[#0a5f7a] transition-colors hover:text-[#00ba7c]"
+                    >
+                      Esqueceu sua senha?
+                    </button>
+                  )}
                 </div>
                 <div className="relative">
                   <div
@@ -138,6 +245,8 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-11 text-sm tracking-wider text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
                   />
@@ -155,13 +264,16 @@ export default function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between px-1 pt-1">
-                <label className="flex cursor-pointer select-none items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-[#0a5f7a] transition-colors focus:ring-[#0a5f7a]/30 focus:ring-offset-0"
-                  />
-                  <span className="text-xs text-slate-600">Lembrar credencial</span>
-                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegisterMode(!isRegisterMode);
+                    setNotice('');
+                  }}
+                  className="text-xs font-semibold text-[#0a5f7a] hover:underline"
+                >
+                  {isRegisterMode ? 'Já possui conta? Fazer login' : 'Não tem conta? Cadastre-se'}
+                </button>
                 <span className="rounded-full border border-slate-200/60 bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-400">
                   Ambiente Seguro
                 </span>
@@ -171,7 +283,10 @@ export default function LoginPage() {
                 <p
                   role="status"
                   aria-live="polite"
-                  className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-xs text-sky-800"
+                  className={`rounded-lg border p-3 text-xs ${isError
+                    ? 'border-rose-200 bg-rose-50 text-rose-800'
+                    : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    }`}
                 >
                   {notice}
                 </p>
@@ -180,9 +295,10 @@ export default function LoginPage() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0a5f7a] to-[#00ba7c] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition-all hover:opacity-95 active:scale-[0.985] focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/25"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0a5f7a] to-[#00ba7c] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition-all hover:opacity-95 active:scale-[0.985] focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/25 disabled:opacity-50"
                 >
-                  <span>Entrar no Sistema</span>
+                  <span>{isSubmitting ? 'Processando...' : isRegisterMode ? 'Cadastrar Conta' : 'Entrar no Sistema'}</span>
                   <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                     arrow_forward
                   </span>
@@ -192,7 +308,7 @@ export default function LoginPage() {
           </div>
 
           <footer className="flex items-center justify-between border-t border-slate-200/60 pt-4 text-xs text-slate-400">
-            <span>© 2026 MedPet</span>
+            <span>Versão 0.1</span>
           </footer>
         </section>
 
@@ -248,7 +364,7 @@ export default function LoginPage() {
           </div>
 
           <div className="relative z-10 flex items-center justify-between border-t border-white/15 pt-4 text-xs text-white/70">
-            <span>MedPet • Gestão Veterinária</span>
+            <span>Gestão Veterinária</span>
             <span className="font-mono text-[11px] tracking-wider">VetCare</span>
           </div>
         </section>

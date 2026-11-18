@@ -95,20 +95,6 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
               </p>
             </div>
           )}
-
-          {appointment.googleEventId && (
-            <div className="pt-2">
-              <a
-                href={appointment.googleCalendarHtmlLink}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1.5 p-2 bg-emerald-50 rounded-lg border border-emerald-100 transition-colors"
-              >
-                <i className="ph ph-calendar-check text-base"></i>
-                <span>Sincronizado no Google Calendar &rarr; Abrir Evento</span>
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Guia Didático de Fluxo de Estados */}
