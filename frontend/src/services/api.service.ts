@@ -3,23 +3,24 @@ import { fetchClients } from './client.service';
 import { fetchServices } from './service.service';
 import { fetchAuditLogs } from './audit.service';
 import { fetchNotifications } from './notification.service';
-import { fetchGoogleCalendarStatus } from './google-calendar.service';
+import { fetchHolidays } from './holiday.service';
 
 export async function loadInitialAppData() {
+  const currentYear = new Date().getFullYear();
   const [
     appointmentsResult,
     clientsResult,
     servicesResult,
     auditLogsResult,
     notificationsResult,
-    googleStatusResult,
+    holidaysResult,
   ] = await Promise.allSettled([
     fetchAppointments(),
     fetchClients(),
     fetchServices(),
     fetchAuditLogs(),
     fetchNotifications(),
-    fetchGoogleCalendarStatus(),
+    fetchHolidays(currentYear),
   ]);
 
   return {
@@ -30,7 +31,7 @@ export async function loadInitialAppData() {
     auditLogs: auditLogsResult.status === 'fulfilled' ? auditLogsResult.value : [],
     notifications:
       notificationsResult.status === 'fulfilled' ? notificationsResult.value : [],
-    googleStatus:
-      googleStatusResult.status === 'fulfilled' ? googleStatusResult.value : null,
+    holidays:
+      holidaysResult.status === 'fulfilled' ? holidaysResult.value : [],
   };
 }

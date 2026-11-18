@@ -5,20 +5,19 @@
  */
 
 // Modelos, Entidades e DTOs
-export * from './models/types';
+export * from './models/types.js';
 
 // Regras de Negócio e Validações
-export * from './models/validation';
+export * from './models/validation.js';
 
 // Utilitários de Data e Padrões Brasileiros
-export * from './utils/date';
+export * from './utils/date.js';
 
 // Utilitários de Animais / Pets
-export * from './utils/pet';
+export * from './utils/pet.js';
 
 // Utilitários de UI e Estilos Clínicos
-export * from './utils/ui-styles';
+export * from './utils/ui-styles.js';
 
 // Views e Exportadores Estruturados
-export * from './views/xml';
-export * from './views/calendar-payload';
+export * from './views/xml.js';

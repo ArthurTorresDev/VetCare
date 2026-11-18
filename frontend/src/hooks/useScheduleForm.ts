@@ -7,7 +7,7 @@ import {
 } from '@vetcare/shared';
 import { ClientWithPets } from '../types/index';
 import * as appointmentService from '../services/appointment.service';
-import { checkDateAvailability } from '../services/google-calendar.service';
+import { checkDateAvailability, formatToDateISO } from '../services/holiday.service';
 
 export function useScheduleForm(
   clients: ClientWithPets[],
@@ -20,8 +20,9 @@ export function useScheduleForm(
   const [selectedClient, setSelectedClient] = useState<ClientWithPets | null>(null);
   const [petId, setPetId] = useState('');
   const [serviceId, setServiceId] = useState('');
-  const [vetName, setVetName] = useState('Dr. Carlos - Veterinário Chefe');
+  const [vetName, setVetName] = useState('Veterinário(a) Clínico');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [previousValidDate, setPreviousValidDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('14:30');
   const [duration, setDuration] = useState(30);
   const [notes, setNotes] = useState('');
@@ -29,10 +30,11 @@ export function useScheduleForm(
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [conflictingAppointment, setConflictingAppointment] = useState<any | null>(null);
 
-  // Estados de Feriados e Horários Especiais da MedPet
+  // Estados de Feriados Nacionais (Brasil API) e Horários Especiais da MedPet
   const [dateCheckResult, setDateCheckResult] = useState<DateCheckResult | null>(null);
   const [showHolidayConfirmation, setShowHolidayConfirmation] = useState(false);
   const [checkingDate, setCheckingDate] = useState(false);
+  const [holidayConfirmedForDate, setHolidayConfirmedForDate] = useState<string | null>(null);
 
   const tutorInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +55,10 @@ export function useScheduleForm(
         const result = await checkDateAvailability(date, time);
         if (isMounted) {
           setDateCheckResult(result);
+          // Se for feriado e o usuário ainda não confirmou esta data explicitamente, exibe modal de confirmação
+          if (result.isHoliday && holidayConfirmedForDate !== date) {
+            setShowHolidayConfirmation(true);
+          }
         }
       } catch (err) {
         console.error('[checkDateAvailability Error]', err);
@@ -65,7 +71,19 @@ export function useScheduleForm(
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [isOpen, date, time]);
+  }, [isOpen, date, time, holidayConfirmedForDate]);
+
+  const handleDateChange = useCallback((newDateRaw: string) => {
+    const isoDate = formatToDateISO(newDateRaw);
+    if (isoDate !== date) {
+      setPreviousValidDate(date);
+      setDate(isoDate);
+      // Reseta confirmação para a nova data
+      if (holidayConfirmedForDate !== isoDate) {
+        setHolidayConfirmedForDate(null);
+      }
+    }
+  }, [date, holidayConfirmedForDate]);
 
   const openModal = useCallback(
     (datePreset?: string, timePreset?: string) => {
@@ -76,8 +94,11 @@ export function useScheduleForm(
       setErrorMessage(null);
       setConflictingAppointment(null);
       setShowHolidayConfirmation(false);
+      setHolidayConfirmedForDate(null);
 
-      if (datePreset) setDate(datePreset);
+      const targetDate = datePreset ? formatToDateISO(datePreset) : new Date().toISOString().split('T')[0];
+      setDate(targetDate);
+      setPreviousValidDate(targetDate);
       if (timePreset) setTime(timePreset);
 
       if (services.length > 0) {
@@ -95,6 +116,7 @@ export function useScheduleForm(
     setErrorMessage(null);
     setConflictingAppointment(null);
     setShowHolidayConfirmation(false);
+    setHolidayConfirmedForDate(null);
   }, []);
 
   const selectTutor = useCallback((client: ClientWithPets) => {
@@ -207,15 +229,17 @@ export function useScheduleForm(
    */
   const confirmHolidayAndSave = useCallback(async () => {
     setShowHolidayConfirmation(false);
-    await executeCreateAppointment();
-  }, [executeCreateAppointment]);
+    setHolidayConfirmedForDate(date);
+  }, [date]);
 
   /**
-   * Usuário decide cancelar ou trocar a data do agendamento
+   * Usuário decide cancelar ou trocar a data do agendamento (restaura data anterior)
    */
   const dismissHolidayPrompt = useCallback(() => {
     setShowHolidayConfirmation(false);
-  }, []);
+    setDate(previousValidDate);
+    setHolidayConfirmedForDate(previousValidDate);
+  }, [previousValidDate]);
 
   return {
     isOpen,
@@ -236,7 +260,7 @@ export function useScheduleForm(
     vetName,
     setVetName,
     date,
-    setDate,
+    setDate: handleDateChange,
     time,
     setTime,
     duration,

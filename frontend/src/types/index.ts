@@ -13,10 +13,4 @@ export type TabType =
   | 'RELATORIOS'
   | 'HISTORICO';
 
-export type DisplayMode = 'CARDS' | 'CALENDAR_WEEK';
-
-export interface GoogleStatusResponse {
-  isMock: boolean;
-  calendarId: string;
-  description: string;
-}
+export type DisplayMode = 'CARDS' | 'Calendario_WEEK';
