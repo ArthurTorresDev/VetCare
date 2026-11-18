@@ -1,5 +1,5 @@
-import type { AppointmentDetailedView } from '../models/types';
-import { formatDateBR, formatTimeBR } from '../utils/date';
+import type { AppointmentDetailedView } from '../models/types.js';
+import { formatDateBR, formatTimeBR } from '../utils/date.js';
 
 function escapeXml(value: unknown): string {
   return String(value ?? '')
@@ -31,9 +31,9 @@ function formatDateTime(value: unknown): string {
   if (value == null || value === '') return '';
 
   const date =
-  value instanceof Date
-    ? value
-    : new Date(value as string | number);
+    value instanceof Date
+      ? value
+      : new Date(value as string | number);
 
   if (Number.isNaN(date.getTime())) return '';
 
@@ -65,7 +65,7 @@ function generateAppointment(a: AppointmentDetailedView): string {
     <servico nome="${escapeXml(a.serviceName)}" categoria="${escapeXml(a.serviceCategory)}" valor="${formatPrice(a.servicePrice)}" />
     <veterinario>${escapeXml(a.veterinarianName)}</veterinario>
     <horario inicio="${escapeXml(formatDateTime(a.startTime))}" termino="${escapeXml(formatDateTime(a.endTime))}" />
-    <googleCalendar eventId="${escapeXml(a.googleEventId)}" status="${escapeXml(a.googleSyncStatus)}" />
+    <googleCalendario eventId="${escapeXml(a.googleEventId)}" status="${escapeXml(a.googleSyncStatus)}" />
     <observacoes>${escapeXml(a.notes)}</observacoes>
   </agendamento>`;
 }
@@ -79,7 +79,7 @@ export function generateAppointmentsXml(
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    `<relatorioAgendamentos total="${appointments.length}" geradoEm="${new Date().toISOString()}">`,
+    `<relatorioAgendamentos clinica="MedPet / VetCare" total="${appointments.length}" geradoEm="${new Date().toISOString()}">`,
     appointments.map(generateAppointment).join('\n'),
     '</relatorioAgendamentos>',
   ].join('\n');
@@ -129,7 +129,7 @@ export function generateAppointmentsHtml(
         <small>Até ${escapeHtml(formatDateTime(a.endTime))}</small>
       </td>
       <td>
-        <span class="calendar ${normalizeStatus(a.googleSyncStatus) === 'SINCRONIZADO' ? 'synced' : 'unsynced'}">
+        <span class="Calendario ${normalizeStatus(a.googleSyncStatus) === 'SINCRONIZADO' ? 'synced' : 'unsynced'}">
           ${escapeHtml(a.googleSyncStatus || 'Não informado')}
         </span>
       </td>
@@ -315,7 +315,7 @@ td small {
   white-space: nowrap;
 }
 
-.status, .calendar {
+.status, .Calendario {
   display: inline-block;
   padding: 6px 10px;
   border-radius: 20px;
@@ -420,7 +420,6 @@ td small {
           <th>Valor</th>
           <th>Veterinário</th>
           <th>Horário</th>
-          <th>Google Calendar</th>
           <th>Observações</th>
         </tr>
       </thead>
