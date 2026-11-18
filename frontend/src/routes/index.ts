@@ -5,7 +5,7 @@ export const AppRoutes = {
   HOME: '/',
   DASHBOARD: '/#dashboard',
   APPOINTMENTS: '/#appointments',
-  CLIENTS: '/#clients',
+  CLIENTS: '/#clientes',
   SERVICES: '/#services',
   REPORTS: '/#reports',
   NOTIFICATIONS: '/#notifications',

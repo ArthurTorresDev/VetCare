@@ -13,7 +13,7 @@ export async function createPetForClient(
     notes?: string;
   },
 ): Promise<Pet> {
-  const res = await fetch(`${API_URL}/clients/${clientId}/pets`, {
+  const res = await fetch(`${API_URL}/clientes/${clientId}/pets`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),

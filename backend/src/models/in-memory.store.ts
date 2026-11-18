@@ -20,7 +20,7 @@ import {
 export class InMemoryStore {
   private static instance: InMemoryStore;
 
-  public clients: Client[] = [];
+  public clientes: Client[] = [];
   public pets: Pet[] = [];
   public services: ClinicService[] = [];
   public appointments: Appointment[] = [];
@@ -43,7 +43,7 @@ export class InMemoryStore {
   }
 
   public reset(): void {
-    this.clients = [...initialClients];
+    this.clientes = [...initialClients];
     this.pets = [...initialPets];
     this.services = [...initialServices];
     this.appointments = createInitialAppointments();

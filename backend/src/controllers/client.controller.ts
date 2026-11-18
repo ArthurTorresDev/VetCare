@@ -20,17 +20,17 @@ export class ClientController {
 
   list = (req: Request, res: Response) => {
     const { search } = req.query;
-    const clients = search
+    const clientes = search
       ? this.clientRepo.search(String(search))
       : this.clientRepo.findAll();
 
     const pets = this.petRepo.findAll();
-    const clientsWithPets = clients.map((c) => ({
+    const clientesWithPets = clientes.map((c) => ({
       ...c,
       pets: pets.filter((p) => p.clientId === c.id),
     }));
 
-    res.json(clientsWithPets);
+    res.json(clientesWithPets);
   };
 
   getById = (req: Request, res: Response) => {
@@ -45,8 +45,8 @@ export class ClientController {
 
   create = (req: Request, res: Response) => {
     const { name, phone, email, cpf } = req.body;
-    if (!name || !phone || !email) {
-      return res.status(400).json({ error: 'Nome, telefone e e-mail são obrigatórios.' });
+    if (!name || !phone) {
+      return res.status(400).json({ error: 'Nome e telefone são obrigatórios.' });
     }
 
     const created = this.clientRepo.create({ name, phone, email, cpf });

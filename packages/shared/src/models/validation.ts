@@ -11,10 +11,10 @@ import type {
 /**
  * Retorna tutores cujo nome contém o termo digitado (mínimo 2 caracteres).
  */
-export function filterClientsByPrefix(clients: Client[], query: string): Client[] {
+export function filterClientsByPrefix(clientes: Client[], query: string): Client[] {
   const trimmed = query.trim().toLowerCase();
   if (trimmed.length < 2) return [];
-  return clients.filter((c) => c.name.toLowerCase().includes(trimmed));
+  return clientes.filter((c) => c.name.toLowerCase().includes(trimmed));
 }
 
 /**

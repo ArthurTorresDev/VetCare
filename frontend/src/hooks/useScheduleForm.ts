@@ -10,7 +10,7 @@ import * as appointmentService from '../services/appointment.service';
 import { checkDateAvailability, formatToDateISO } from '../services/holiday.service';
 
 export function useScheduleForm(
-  clients: ClientWithPets[],
+  clientes: ClientWithPets[],
   services: ClinicService[],
   onSuccess: (created: AppointmentDetailedView) => void,
 ) {
@@ -39,8 +39,8 @@ export function useScheduleForm(
   const tutorInputRef = useRef<HTMLInputElement>(null);
 
   const tutorRecommendations = useMemo(
-    () => filterClientsByPrefix(clients, tutorSearchInput) as ClientWithPets[],
-    [clients, tutorSearchInput],
+    () => filterClientsByPrefix(clientes, tutorSearchInput) as ClientWithPets[],
+    [clientes, tutorSearchInput],
   );
 
   // Checagem automática de feriados e horários ao alterar data ou hora
