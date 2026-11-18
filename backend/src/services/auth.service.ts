@@ -10,9 +10,11 @@ import {
 } from '@vetcare/shared';
 import type { IUserRepository } from '../repositories/user.repository.interface.js';
 import { InMemoryUserRepository } from '../repositories/in-memory-user.repository.js';
+import { PostgresUserRepository } from '../repositories/postgres-user.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 import { hashService, HashService } from './hash.service.js';
 import { tokenService, TokenService } from './token.service.js';
+import { env } from '../config/env.js';
 
 export class AuthenticationError extends Error {
   public statusCode: number;
@@ -33,12 +35,12 @@ export class AuthService {
   private tokenizer: TokenService;
 
   constructor(
-    userRepo: IUserRepository = new InMemoryUserRepository(),
+    userRepo?: IUserRepository,
     auditRepo: AuditRepository = new AuditRepository(),
     hasher: HashService = hashService,
     tokenizer: TokenService = tokenService,
   ) {
-    this.userRepo = userRepo;
+    this.userRepo = userRepo ?? (env.isTest ? new InMemoryUserRepository() : new PostgresUserRepository());
     this.auditRepo = auditRepo;
     this.hasher = hasher;
     this.tokenizer = tokenizer;

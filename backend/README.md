@@ -44,6 +44,20 @@ Backend principal do sistema VetCare, estruturado em TypeScript com arquitetura 
 
 ## 🛠️ Como Executar
 
+### PostgreSQL
+
+Configure `DATABASE_URL` no `.env` da raiz do repositório, por exemplo:
+
+```env
+DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/seu_banco
+```
+
+Se a senha contiver caracteres especiais, codifique-os para uso em uma URL. A API carrega esse arquivo automaticamente e só inicia depois de validar a conexão; falhas de autenticação aparecem no terminal, em vez de a API operar silenciosamente em memória.
+
+No pgAdmin, selecione o banco indicado em `DATABASE_URL` e execute `src/database/schema.sql` (relativo à pasta `backend`) uma vez para criar as tabelas da aplicação. Os endpoints de atendimentos, veterinários e atendentes passam então a persistir no PostgreSQL.
+
+No primeiro início, a API também cria as tabelas `users` e `atendente` caso ainda não existam. O cadastro de uma conta de recepção grava os dados de autenticação em `users` e os dados de contato em `atendente` na mesma operação.
+
 ```bash
 # Executar em modo desenvolvimento (com live reload via tsx)
 npm run dev --workspace=@vetcare/api

@@ -6,7 +6,6 @@ import {
   UpdateAppointmentDTO,
   calculateEndTime,
   hasScheduleConflict,
-  formatGoogleCalendarEventPayload,
   formatDateBR,
   formatTimeBR,
   generateAppointmentsXml,
@@ -19,10 +18,6 @@ import { PetRepository } from '../repositories/pet.repository.js';
 import { ServiceRepository } from '../repositories/service.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 import { NotificationService } from './notification.service.js';
-import {
-  getGoogleCalendarService,
-  IGoogleCalendarService,
-} from './google-calendar.service.js';
 
 export class SchedulingService {
   private appointmentRepo: AppointmentRepository;
@@ -31,7 +26,6 @@ export class SchedulingService {
   private serviceRepo: ServiceRepository;
   private auditRepo: AuditRepository;
   private notificationService: NotificationService;
-  private gcalService: IGoogleCalendarService;
 
   constructor(
     appointmentRepo = new AppointmentRepository(),
@@ -40,7 +34,6 @@ export class SchedulingService {
     serviceRepo = new ServiceRepository(),
     auditRepo = new AuditRepository(),
     notificationService = new NotificationService(),
-    gcalService = getGoogleCalendarService(),
   ) {
     this.appointmentRepo = appointmentRepo;
     this.clientRepo = clientRepo;
@@ -48,7 +41,6 @@ export class SchedulingService {
     this.serviceRepo = serviceRepo;
     this.auditRepo = auditRepo;
     this.notificationService = notificationService;
-    this.gcalService = gcalService;
   }
 
   listAppointments(filters?: {
@@ -131,39 +123,10 @@ export class SchedulingService {
     }
 
     const appointmentId = `apt-${Date.now()}`;
-    const veterinarianName = dto.veterinarianName || 'Dr. Carlos - Veterinário Chefe';
+    const veterinarianName = dto.veterinarianName || 'Veterinário(a) Clínico';
     const user = dto.createdByUser || 'Recepção (MedPet)';
 
-    // 2. Sincronização Google Calendar
-    const gcalPayload = formatGoogleCalendarEventPayload({
-      appointmentId,
-      clientName: client.name,
-      clientPhone: client.phone,
-      petName: pet.name,
-      serviceName: service.name,
-      veterinarianName,
-      startTime: dto.startTime,
-      endTime,
-      notes: dto.notes,
-    });
-
-    let googleEventId: string | undefined;
-    let googleCalendarHtmlLink: string | undefined;
-    let googleSyncStatus: Appointment['googleSyncStatus'] = 'PENDING';
-    let googleSyncError: string | undefined;
-
-    try {
-      const gcalResult = await this.gcalService.createEvent(gcalPayload);
-      googleEventId = gcalResult.eventId;
-      googleCalendarHtmlLink = gcalResult.htmlLink;
-      googleSyncStatus = gcalResult.isMock ? 'MOCKED' : 'SYNCED';
-    } catch (err: unknown) {
-      console.error('[Google Calendar Sync Failed]', err);
-      googleSyncStatus = 'FAILED';
-      googleSyncError = err instanceof Error ? err.message : 'Erro ao conectar ao Google Calendar';
-    }
-
-    // 3. Persistência
+    // Persistência
     const newAppointment: Appointment = {
       id: appointmentId,
       clientId: dto.clientId,
@@ -174,10 +137,6 @@ export class SchedulingService {
       endTime,
       status: 'AGENDADO',
       notes: dto.notes,
-      googleEventId,
-      googleCalendarHtmlLink,
-      googleSyncStatus,
-      googleSyncError,
       createdByUser: user,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -286,19 +245,6 @@ export class SchedulingService {
       details: `Situação do agendamento alterada de ${existing.status} para ${newStatus}`,
     });
 
-    // Notificação Google Agenda
-    if (updated.googleEventId) {
-      try {
-        if (newStatus === 'CANCELADO') {
-          await this.gcalService.updateEvent(updated.googleEventId, {
-            summary: `[CANCELADO] ${updated.serviceName}: ${updated.petName}`,
-          });
-        }
-      } catch (err) {
-        console.error('[Google Calendar Status Update Error]', err);
-      }
-    }
-
     // Notificação E-mail Tutor
     if (updated.clientEmail && updated.clientEmail !== '-') {
       if (newStatus === 'CANCELADO') {
@@ -325,17 +271,7 @@ export class SchedulingService {
     id: string,
     user = 'Recepção (MedPet)',
   ): Promise<AppointmentDetailedView> {
-    const updated = await this.updateAppointmentStatus(id, 'CANCELADO', user);
-
-    if (updated.googleEventId) {
-      try {
-        await this.gcalService.deleteEvent(updated.googleEventId);
-      } catch (err) {
-        console.error('[Google Calendar Delete Error]', err);
-      }
-    }
-
-    return updated;
+    return await this.updateAppointmentStatus(id, 'CANCELADO', user);
   }
 
   exportAppointmentsXml(): string {

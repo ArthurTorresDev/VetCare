@@ -12,6 +12,18 @@ export class AppointmentRepository {
     this.store = store;
   }
 
+  getClients() {
+    return this.store.clients;
+  }
+
+  getPets() {
+    return this.store.pets;
+  }
+
+  getServices() {
+    return this.store.services;
+  }
+
   findAll(): Appointment[] {
     return this.store.appointments;
   }

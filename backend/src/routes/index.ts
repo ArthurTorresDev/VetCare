@@ -5,11 +5,13 @@ import petRoutes from './pet.routes.js';
 import serviceRoutes from './service.routes.js';
 import appointmentRoutes from './appointment.routes.js';
 import auditRoutes from './audit.routes.js';
-import notificationRoutes from './notification.routes.js';
-import googleCalendarRoutes from './google-calendar.routes.js';
+import holidayRoutes from './holiday.routes.js';
 import authRoutes from './auth.routes.js';
 import userRoutes from './user.routes.js';
 import docsRoutes from './docs.routes.js';
+import veterinarioRoutes from './veterinario.routes.js';
+import atendenteRoutes from './atendente.routes.js';
+import atendimentoRoutes from './atendimento.routes.js';
 
 const apiRouter = Router();
 
@@ -20,14 +22,16 @@ apiRouter.use(docsRoutes);
 apiRouter.use(authRoutes);
 apiRouter.use(userRoutes);
 
-// Rotas de Domínio da Clínica
+// Rotas de Domínio da Clínica e medpet.sql
 apiRouter.use(healthRoutes);
 apiRouter.use(clientRoutes);
 apiRouter.use(petRoutes);
+apiRouter.use(veterinarioRoutes);
+apiRouter.use(atendenteRoutes);
+apiRouter.use(atendimentoRoutes);
 apiRouter.use(serviceRoutes);
 apiRouter.use(appointmentRoutes);
 apiRouter.use(auditRoutes);
-apiRouter.use(notificationRoutes);
-apiRouter.use(googleCalendarRoutes);
+apiRouter.use(holidayRoutes);
 
 export default apiRouter;

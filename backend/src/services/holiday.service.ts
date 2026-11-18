@@ -1,12 +1,24 @@
 /**
- * Serviço de Verificação de Feriados e Horários de Atendimento da MedPet
- * - Integra com o Calendário Oficial de Feriados do Google Calendar (pt.brazilian#holiday@group.v.calendar.google.com)
- * - Fallback inteligente com BrasilAPI e motor offline de feriados nacionais brasileiros
- * - Respeita as regras de atendimento da MedPet (Seg-Sex 8h-17h30, Sáb 8h30-12h30, Dom Fechado)
+ * Serviço Centralizado de Feriados Nacionais - Brasil API & Regras MedPet
+ * - Consulta exclusiva via GET https://brasilapi.com.br/api/feriados/v1/{ano}
+ * - Cache persistente (PostgreSQL / In-Memory Store centralizado)
+ * - Exatamente UMA requisição externa por ano
+ * - Proteção contra chamadas simultâneas (in-flight promise lock por ano)
+ * - Fallback resiliente offline (Algoritmo Meeus/Jones/Butcher)
+ * - Identificação em formato DD-MM-YYYY e YYYY-MM-DD
  */
 
+import { holidayRepository, HolidayEntity } from '../repositories/holiday.repository.js';
+
+export interface BrasilApiHoliday {
+  date: string; // YYYY-MM-DD
+  name: string;
+  type: string;
+}
+
 export interface DateCheckResult {
-  date: string;
+  date: string; // YYYY-MM-DD
+  dateBR: string; // DD-MM-YYYY
   time?: string;
   isHoliday: boolean;
   holidayName?: string;
@@ -19,17 +31,65 @@ export interface DateCheckResult {
 
 export interface HolidayEntry {
   date: string; // YYYY-MM-DD
+  dateBR: string; // DD-MM-YYYY
   name: string;
   type: 'national' | 'custom';
 }
 
 export class HolidayService {
-  private cacheHolidaysByYear: Map<number, HolidayEntry[]> = new Map();
+  // Controle de promessas ativas para impedir requisições simultâneas para o mesmo ano
+  private inFlightSyncs: Map<number, Promise<HolidayEntry[]>> = new Map();
+  // Cache rápido em memória para requisições frequentes no mesmo ciclo de vida do backend
+  private memoryCache: Map<number, HolidayEntry[]> = new Map();
 
   /**
-   * Calcula feriados móveis baseados na data da Páscoa (Algoritmo de Meeus/Jones/Butcher)
+   * Converte data ISO (YYYY-MM-DD) para formato brasileiro padrão (DD-MM-YYYY)
    */
-  private calculateEaster(year: number): Date {
+  public toBRFormat(dateStr: string): string {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const [y, m, d] = parts;
+      return `${d}-${m}-${y}`;
+    }
+    return dateStr;
+  }
+
+  /**
+   * Converte formato brasileiro (DD-MM-YYYY) para ISO (YYYY-MM-DD)
+   */
+  public toISOFormat(dateStr: string): string {
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 2) {
+      const [d, m, y] = parts;
+      return `${y}-${m}-${d}`;
+    }
+    return dateStr;
+  }
+
+  /**
+   * Normaliza nome do feriado mantendo boa apresentação
+   */
+  private normalizeHolidayName(name: string): string {
+    if (!name) return '';
+    const lowercaseWords = new Set(['da', 'de', 'do', 'das', 'dos', 'e']);
+    return name
+      .trim()
+      .split(/\s+/)
+      .map((word, idx) => {
+        const lower = word.toLowerCase();
+        if (idx > 0 && lowercaseWords.has(lower)) {
+          return lower;
+        }
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      })
+      .join(' ');
+  }
+
+  /**
+   * Algoritmo determinístico Meeus/Jones/Butcher para Páscoa e feriados móveis.
+   * Usado exclusivamente como fallback de segurança caso a Brasil API esteja indisponível.
+   */
+  public getOfflineDeterministicHolidays(year: number): HolidayEntry[] {
     const a = year % 19;
     const b = Math.floor(year / 100);
     const c = year % 100;
@@ -42,144 +102,176 @@ export class HolidayService {
     const k = c % 4;
     const l = (32 + 2 * e + 2 * i - h - k) % 7;
     const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3 = Março, 4 = Abril
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
     const day = ((h + l - 7 * m + 114) % 31) + 1;
-    return new Date(Date.UTC(year, month - 1, day));
-  }
+    const easter = new Date(Date.UTC(year, month - 1, day));
 
-  /**
-   * Gera lista completa de feriados nacionais brasileiros para o ano especificado
-   */
-  public getNationalHolidays(year: number): HolidayEntry[] {
-    if (this.cacheHolidaysByYear.has(year)) {
-      return this.cacheHolidaysByYear.get(year)!;
-    }
-
-    const fmt = (d: Date) => d.toISOString().split('T')[0];
-    const addDays = (base: Date, days: number) => {
+    const fmt = (base: Date, days: number) => {
       const copy = new Date(base.getTime());
       copy.setUTCDate(copy.getUTCDate() + days);
-      return copy;
+      return copy.toISOString().split('T')[0];
     };
 
-    const easter = this.calculateEaster(year);
-    const carnival = addDays(easter, -47); // Terça-feira de Carnaval
-    const goodFriday = addDays(easter, -2); // Sexta-feira Santa
-    const corpusChristi = addDays(easter, 60); // Corpus Christi
+    const carnival = fmt(easter, -47);
+    const goodFriday = fmt(easter, -2);
+    const corpusChristi = fmt(easter, 60);
 
-    const list: HolidayEntry[] = [
-      { date: `${year}-01-01`, name: 'Confraternização Universal', type: 'national' },
-      { date: fmt(carnival), name: 'Carnaval', type: 'national' },
-      { date: fmt(goodFriday), name: 'Sexta-feira Santa', type: 'national' },
-      { date: fmt(easter), name: 'Páscoa', type: 'national' },
-      { date: `${year}-04-21`, name: 'Tiradentes', type: 'national' },
-      { date: `${year}-05-01`, name: 'Dia Mundial do Trabalho', type: 'national' },
-      { date: fmt(corpusChristi), name: 'Corpus Christi', type: 'national' },
-      { date: `${year}-09-07`, name: 'Independência do Brasil', type: 'national' },
-      { date: `${year}-10-12`, name: 'Nossa Senhora Aparecida (Padroeira do Brasil)', type: 'national' },
-      { date: `${year}-11-02`, name: 'Finados', type: 'national' },
-      { date: `${year}-11-15`, name: 'Proclamação da República', type: 'national' },
-      { date: `${year}-11-20`, name: 'Dia Nacional de Zumbi e da Consciência Negra', type: 'national' },
-      { date: `${year}-12-25`, name: 'Natal', type: 'national' },
+    const list: Array<{ date: string; name: string }> = [
+      { date: `${year}-01-01`, name: 'Confraternização Universal' },
+      { date: carnival, name: 'Carnaval' },
+      { date: goodFriday, name: 'Sexta-feira Santa' },
+      { date: easter.toISOString().split('T')[0], name: 'Páscoa' },
+      { date: `${year}-04-21`, name: 'Tiradentes' },
+      { date: `${year}-05-01`, name: 'Dia Mundial do Trabalho' },
+      { date: corpusChristi, name: 'Corpus Christi' },
+      { date: `${year}-09-07`, name: 'Independência do Brasil' },
+      { date: `${year}-10-12`, name: 'Nossa Senhora Aparecida' },
+      { date: `${year}-11-02`, name: 'Finados' },
+      { date: `${year}-11-15`, name: 'Proclamação da República' },
+      { date: `${year}-11-20`, name: 'Dia Nacional de Zumbi e da Consciência Negra' },
+      { date: `${year}-12-25`, name: 'Natal' },
     ];
 
-    this.cacheHolidaysByYear.set(year, list);
-    return list;
+    return list.map((item) => ({
+      date: item.date,
+      dateBR: this.toBRFormat(item.date),
+      name: item.name,
+      type: 'national',
+    }));
   }
 
   /**
-   * Tenta enriquecer feriados via Google Calendar ou BrasilAPI
+   * Obtém feriados de um determinado ano.
+   * Se já existirem no repositório persistido ou cache, reutiliza sem fazer nova chamada externa.
+   * Se for um novo ano sem dados, consulta a Brasil API apenas UMA vez.
    */
-  public async fetchOnlineHolidays(year: number, googleAccessToken?: string): Promise<HolidayEntry[]> {
-    // 1. Tenta buscar do calendário oficial de feriados do Brasil no Google Calendar
-    if (googleAccessToken) {
+  public async getHolidaysByYear(year: number): Promise<HolidayEntry[]> {
+    // 1. Verifica cache rápido de memória
+    if (this.memoryCache.has(year)) {
+      return this.memoryCache.get(year)!;
+    }
+
+    // 2. Verifica repositório persistente (PostgreSQL / In-memory centralizado)
+    const persisted = await holidayRepository.findByYear(year);
+    if (persisted.length > 0) {
+      const formatted: HolidayEntry[] = persisted.map((p) => ({
+        date: p.data_feriado,
+        dateBR: this.toBRFormat(p.data_feriado),
+        name: p.nome,
+        type: 'national',
+      }));
+      this.memoryCache.set(year, formatted);
+      return formatted;
+    }
+
+    // 3. Se já existe uma requisição em andamento para este ano, aguarda a mesma (evita requisições concorrentes)
+    if (this.inFlightSyncs.has(year)) {
+      return await this.inFlightSyncs.get(year)!;
+    }
+
+    // 4. Inicia consulta à Brasil API protegida por lock
+    const syncPromise = (async () => {
       try {
-        const timeMin = `${year}-01-01T00:00:00Z`;
-        const timeMax = `${year}-12-31T23:59:59Z`;
-        const gcalUrl = `https://www.googleapis.com/calendar/v3/calendars/pt.brazilian%23holiday%40group.v.calendar.google.com/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true`;
-        
-        const response = await fetch(gcalUrl, {
-          headers: { Authorization: `Bearer ${googleAccessToken}` },
+        console.log(`[HolidayService] Consultando Brasil API para o ano ${year}: https://brasilapi.com.br/api/feriados/v1/${year}`);
+        const response = await fetch(`https://brasilapi.com.br/api/feriados/v1/${year}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'User-Agent': 'VetCare-MedPet-Application',
+          },
         });
 
         if (response.ok) {
-          const data = await response.json();
-          if (data.items && data.items.length > 0) {
-            const gcalHolidays: HolidayEntry[] = data.items.map((item: any) => ({
-              date: item.start.date || item.start.dateTime.split('T')[0],
-              name: item.summary,
+          const data: BrasilApiHoliday[] = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const holidaysToSave = data.map((item) => ({
+              ano: year,
+              data_feriado: item.date,
+              nome: this.normalizeHolidayName(item.name),
+              tipo: item.type || 'national',
+            }));
+
+            const saved = await holidayRepository.saveBatch(year, holidaysToSave);
+            const result: HolidayEntry[] = saved.map((s) => ({
+              date: s.data_feriado,
+              dateBR: this.toBRFormat(s.data_feriado),
+              name: s.nome,
               type: 'national',
             }));
-            this.cacheHolidaysByYear.set(year, gcalHolidays);
-            return gcalHolidays;
+
+            this.memoryCache.set(year, result);
+            return result;
           }
+        } else {
+          console.warn(`[HolidayService] Brasil API retornou HTTP ${response.status} para o ano ${year}. Ativando gerador determinístico.`);
         }
       } catch (err) {
-        console.warn('[HolidayService] Falha ao consultar Google Calendar holidays:', err);
+        console.error(`[HolidayService] Falha de conexão com a Brasil API para o ano ${year}:`, err);
       }
-    }
 
-    // 2. Fallback via BrasilAPI
+      // Se falhou ou API offline, usa fallback offline seguro e persiste para não tentar repetir desnecessariamente
+      const offlineHolidays = this.getOfflineDeterministicHolidays(year);
+      await holidayRepository.saveBatch(
+        year,
+        offlineHolidays.map((h) => ({
+          ano: year,
+          data_feriado: h.date,
+          nome: h.name,
+          tipo: 'national',
+        }))
+      );
+      this.memoryCache.set(year, offlineHolidays);
+      return offlineHolidays;
+    })();
+
+    this.inFlightSyncs.set(year, syncPromise);
+
     try {
-      const bApiUrl = `https://brasilapi.com.br/api/feriados/v1/${year}`;
-      const response = await fetch(bApiUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const bHolidays: HolidayEntry[] = data.map((item: any) => ({
-            date: item.date,
-            name: this.normalizeHolidayName(item.name),
-            type: 'national',
-          }));
-          this.cacheHolidaysByYear.set(year, bHolidays);
-          return bHolidays;
-        }
-      }
-    } catch {
-      // Ignora erro e usa gerador offline
+      return await syncPromise;
+    } finally {
+      this.inFlightSyncs.delete(year);
     }
-
-    // 3. Fallback determinístico offline
-    return this.getNationalHolidays(year);
-  }
-
-  private normalizeHolidayName(name: string): string {
-    if (!name) return '';
-    const lowercaseWords = new Set(['da', 'de', 'do', 'das', 'dos', 'e']);
-    return name
-      .split(' ')
-      .map((word, idx) => {
-        const lower = word.toLowerCase();
-        if (idx > 0 && lowercaseWords.has(lower)) {
-          return lower;
-        }
-        return lower.charAt(0).toUpperCase() + lower.slice(1);
-      })
-      .join(' ');
   }
 
   /**
-   * Verifica se a data/hora selecionada possui avisos operacionais da MedPet:
-   * - Feriados Nacionais (Alerta com nome do feriado)
-   * - Domingos (Clínica fechada)
-   * - Sábados fora do horário (08:30 às 12:30)
-   * - Dias de semana fora do horário (08:00 às 17:30)
+   * Verifica se uma data específica (em formato YYYY-MM-DD ou DD-MM-YYYY) é feriado nacional
    */
-  public async checkDate(
-    dateStr: string,
-    timeStr?: string,
-    googleAccessToken?: string,
-  ): Promise<DateCheckResult> {
-    const [yStr, mStr, dStr] = dateStr.split('-');
+  public async isHoliday(dateInput: string): Promise<{ isHoliday: boolean; holidayName?: string }> {
+    const isoDate = dateInput.includes('/') ? dateInput.replace(/\//g, '-') : dateInput;
+    const dateFormatted = this.toISOFormat(isoDate);
+    const [yStr] = dateFormatted.split('-');
+    const year = parseInt(yStr, 10);
+
+    if (isNaN(year)) {
+      return { isHoliday: false };
+    }
+
+    const holidays = await this.getHolidaysByYear(year);
+    const found = holidays.find((h) => h.date === dateFormatted || h.dateBR === this.toBRFormat(dateFormatted));
+
+    return {
+      isHoliday: !!found,
+      holidayName: found?.name,
+    };
+  }
+
+  /**
+   * Checagem unificada de regras operacionais de data e horário da MedPet
+   */
+  public async checkDate(dateStr: string, timeStr?: string): Promise<DateCheckResult> {
+    const rawClean = dateStr.includes('/') ? dateStr.replace(/\//g, '-') : dateStr;
+    const isoDate = this.toISOFormat(rawClean);
+    const brDate = this.toBRFormat(isoDate);
+
+    const [yStr, mStr, dStr] = isoDate.split('-');
     const year = parseInt(yStr, 10);
     const month = parseInt(mStr, 10);
     const day = parseInt(dStr, 10);
 
-    // Feriados do ano
-    const holidays = await this.fetchOnlineHolidays(year, googleAccessToken);
-    const holiday = holidays.find((h) => h.date === dateStr);
+    const holidays = await this.getHolidaysByYear(year);
+    const holiday = holidays.find((h) => h.date === isoDate || h.dateBR === brDate);
 
-    // Dia da semana em UTC para evitar timezone drift
+    // Evitar timezone drift usando Date.UTC
     const dateObj = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
     const dayOfWeek = dateObj.getUTCDay(); // 0 = Domingo, 6 = Sábado
 
@@ -188,9 +280,11 @@ export class HolidayService {
     let isSaturdayAfternoon = false;
     let isOutsideClinicHours = false;
 
-    // 1. Alerta de Feriado
+    // 1. Alerta de Feriado Nacional
     if (holiday) {
-      warnings.push(`Atenção: ${dStr}/${mStr}/${year} é Feriado (${holiday.name}). A MedPet pode não ter expediente ou operar em escala de plantão/emergência.`);
+      warnings.push(
+        `Atenção: ${dStr}/${mStr}/${year} é Feriado Nacional (${holiday.name}). A MedPet pode não ter expediente ou operar em escala de plantão/emergência.`
+      );
     }
 
     // 2. Alerta de Domingo
@@ -204,14 +298,14 @@ export class HolidayService {
       const totalMinutes = parseInt(hourStr, 10) * 60 + parseInt(minStr, 10);
 
       if (dayOfWeek === 6) {
-        // Sábado: 8h30 (510 min) às 12h30 (750 min)
+        // Sábado: 08:30 (510 min) às 12:30 (750 min)
         if (totalMinutes < 510 || totalMinutes > 750) {
           isSaturdayAfternoon = totalMinutes > 750;
           isOutsideClinicHours = true;
           warnings.push('Aos sábados, o expediente da MedPet é exclusivamente das 08:30 às 12:30.');
         }
       } else if (!isSunday) {
-        // Segunda a Sexta: 8h00 (480 min) às 17h30 (1050 min)
+        // Segunda a Sexta: 08:00 (480 min) às 17:30 (1050 min)
         if (totalMinutes < 480 || totalMinutes > 1050) {
           isOutsideClinicHours = true;
           warnings.push('O expediente regular de segunda a sexta é das 08:00 às 17:30.');
@@ -220,7 +314,8 @@ export class HolidayService {
     }
 
     return {
-      date: dateStr,
+      date: isoDate,
+      dateBR: brDate,
       time: timeStr,
       isHoliday: !!holiday,
       holidayName: holiday?.name,
@@ -234,4 +329,3 @@ export class HolidayService {
 }
 
 export const holidayService = new HolidayService();
-

@@ -133,9 +133,80 @@ export const openApiSpec = {
           id: { type: 'string', example: 'usr_f81d4fae-7dec-11d0-a765-00a0c91e6bf6' },
         },
       },
+      Veterinario: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' },
+          nome: { type: 'string', example: 'Dra. Camila Rocha' },
+          crmv: { type: 'string', example: 'SP-12345' },
+          telefone: { type: 'string', example: '(11) 98765-1111' },
+          email: { type: 'string', format: 'email', example: 'camila.rocha@medpet.com' },
+          criadoEm: { type: 'string', format: 'date-time' },
+        },
+      },
+      Atendente: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' },
+          nome: { type: 'string', example: 'Ana Paula Santos' },
+          email: { type: 'string', format: 'email', example: 'ana.santos@medpet.com' },
+          telefone: { type: 'string', example: '(11) 98765-3333' },
+          criadoEm: { type: 'string', format: 'date-time' },
+        },
+      },
+      Atendimento: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' },
+          petId: { type: 'string', format: 'uuid' },
+          veterinarioId: { type: 'string', format: 'uuid' },
+          atendenteId: { type: 'string', format: 'uuid' },
+          tipoServico: { type: 'string', example: 'Consulta Clínica Geral' },
+          dataHora: { type: 'string', format: 'date-time' },
+          status: { type: 'string', example: 'Agendado' },
+          observacoes: { type: 'string', example: 'Retorno vacina' },
+          criadoEm: { type: 'string', format: 'date-time' },
+        },
+      },
     },
   },
   paths: {
+    '/veterinarios': {
+      get: {
+        tags: ['Veterinários (medpet.sql)'],
+        summary: 'Listar corpo clínico veterinário',
+        responses: { 200: { description: 'Lista de veterinários' } },
+      },
+      post: {
+        tags: ['Veterinários (medpet.sql)'],
+        summary: 'Cadastrar veterinário',
+        responses: { 201: { description: 'Veterinário criado' } },
+      },
+    },
+    '/atendentes': {
+      get: {
+        tags: ['Atendentes (medpet.sql)'],
+        summary: 'Listar atendentes e recepção',
+        responses: { 200: { description: 'Lista de atendentes' } },
+      },
+      post: {
+        tags: ['Atendentes (medpet.sql)'],
+        summary: 'Cadastrar atendente',
+        responses: { 201: { description: 'Atendente criado' } },
+      },
+    },
+    '/atendimentos': {
+      get: {
+        tags: ['Atendimentos (medpet.sql)'],
+        summary: 'Listar atendimentos clínicos',
+        responses: { 200: { description: 'Lista de atendimentos' } },
+      },
+      post: {
+        tags: ['Atendimentos (medpet.sql)'],
+        summary: 'Registrar atendimento clínico',
+        responses: { 201: { description: 'Atendimento registrado' } },
+      },
+    },
     '/auth/register': {
       post: {
         tags: ['Autenticação'],
