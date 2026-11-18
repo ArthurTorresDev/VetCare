@@ -59,7 +59,7 @@ export default function VetCareDashboard() {
   } = useAppointments();
 
   // Hook: Clientes e Pets
-  const { clients, setClients, addClient, addPet } = useClients();
+  const { clientes, setClients, addClient, addPet } = useClients();
 
   // Hook: Catálogo de Serviços (Req 3.3)
   const {
@@ -84,7 +84,7 @@ export default function VetCareDashboard() {
     try {
       const data = await loadInitialAppData();
       setAppointments(data.appointments);
-      setClients(data.clients);
+      setClients(data.clientes);
       setServices(data.services);
       setAuditLogs(data.auditLogs);
       setNotifications(data.notifications);
@@ -101,7 +101,7 @@ export default function VetCareDashboard() {
   }, [loadData]);
 
   // Hook: Formulário de Agendamento
-  const scheduleForm = useScheduleForm(clients, services, async (created) => {
+  const scheduleForm = useScheduleForm(clientes, services, async (created) => {
     setAppointments((prev) => [created, ...prev]);
     // Recarrega auditoria e notificações
     loadData();
@@ -176,7 +176,7 @@ export default function VetCareDashboard() {
 
           {activeTab === 'CLIENTES' && (
             <ClientsTab
-              clients={clients}
+              clientes={clientes}
               onOpenNewTutorModal={tutorForm.openModal}
               onOpenNewPetModal={petForm.openForTutor}
               onScheduleForClient={(client) => {
