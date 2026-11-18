@@ -7,11 +7,11 @@ import {
 describe('Gestão de Agendamentos e Repositório Clínico', () => {
   it('deve gerenciar agendamentos no repositório e montar visualização detalhada com tutor e pet', () => {
     const repo = new AppointmentRepository();
-    const clients = repo.getClients();
+    const clientes = repo.getClients();
     const pets = repo.getPets();
     const services = repo.getServices();
 
-    expect(clients.length).toBeGreaterThan(0);
+    expect(clientes.length).toBeGreaterThan(0);
     expect(pets.length).toBeGreaterThan(0);
     expect(services.length).toBeGreaterThan(0);
 
@@ -20,7 +20,7 @@ describe('Gestão de Agendamentos e Repositório Clínico', () => {
 
     const newAppt = repo.create({
       id: 'apt-test-1',
-      clientId: clients[0].id,
+      clientId: clientes[0].id,
       petId: pets[0].id,
       serviceId: services[0].id,
       veterinarianName: 'Dra. Camila Rocha',
@@ -32,7 +32,7 @@ describe('Gestão de Agendamentos e Repositório Clínico', () => {
     });
 
     expect(newAppt.id).toBe('apt-test-1');
-    expect(newAppt.clientName).toBe(clients[0].name);
+    expect(newAppt.clientName).toBe(clientes[0].name);
     expect(newAppt.petName).toBe(pets[0].name);
     expect(newAppt.serviceName).toBe(services[0].name);
 
