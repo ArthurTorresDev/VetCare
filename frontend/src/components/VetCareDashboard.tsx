@@ -212,9 +212,6 @@ export default function VetCareDashboard() {
 
           {activeTab === 'HISTORICO' && <AuditTab logs={auditLogs} />}
 
-          {activeTab === 'NOTIFICACOES' && (
-            <NotificationsTab notifications={notifications} />
-          )}
         </div>
       </main>
 

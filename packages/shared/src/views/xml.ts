@@ -30,7 +30,10 @@ function formatPrice(value: unknown): string {
 function formatDateTime(value: unknown): string {
   if (value == null || value === '') return '';
 
-  const date = value instanceof Date ? value : new Date(value);
+  const date =
+  value instanceof Date
+    ? value
+    : new Date(value as string | number);
 
   if (Number.isNaN(date.getTime())) return '';
 

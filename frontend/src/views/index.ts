@@ -1,4 +1,3 @@
-export { AppointmentsTab } from '../components/tabs/AppointmentsTab';
 export { CancelledTab } from '../components/tabs/CancelledTab';
 export { ClientsTab } from '../components/tabs/ClientsTab';
 export { CompletedTab } from '../components/tabs/CompletedTab';
