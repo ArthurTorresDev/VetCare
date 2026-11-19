@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/index';
 import { registerUser } from '../../services/auth.service';
@@ -83,12 +84,7 @@ export default function LoginPage() {
                 <span className="h-3 w-3 rounded-full border border-[#d89e24]/40 bg-[#febc2e] shadow-sm" />
                 <span className="h-3 w-3 rounded-full border border-[#1aab29]/40 bg-[#28c840] shadow-sm" />
               </div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/60 bg-slate-100/80 px-2.5 py-1">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-[#00ba7c]" />
-                <span className="text-xs font-semibold tracking-tight text-slate-700">
-                  Sistema Online
-                </span>
-              </div>
+              <span className="text-xs font-semibold text-slate-500">Acesso da equipe</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -223,13 +219,12 @@ export default function LoginPage() {
                     Senha de acesso <span className="text-rose-500">*</span>
                   </label>
                   {!isRegisterMode && (
-                    <button
-                      type="button"
-                      onClick={() => setNotice('A redefinição de senha pode ser solicitada à administração.')}
-                      className="text-xs font-semibold text-[#0a5f7a] transition-colors hover:text-[#00ba7c]"
-                    >
-                      Esqueceu sua senha?
-                    </button>
+                  <Link
+                    href="/login/recuperar"
+                    className="text-xs font-semibold text-[#0a5f7a] transition-colors hover:text-[#00ba7c]"
+                  >
+                    Esqueceu sua senha?
+                  </Link>
                   )}
                 </div>
                 <div className="relative">
@@ -278,7 +273,6 @@ export default function LoginPage() {
                   Ambiente Seguro
                 </span>
               </div>
-
               {notice && (
                 <p
                   role="status"
