@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,12 +40,7 @@ export default function LoginPage() {
                 <span className="h-3 w-3 rounded-full border border-[#d89e24]/40 bg-[#febc2e] shadow-sm" />
                 <span className="h-3 w-3 rounded-full border border-[#1aab29]/40 bg-[#28c840] shadow-sm" />
               </div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/60 bg-slate-100/80 px-2.5 py-1">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-[#00ba7c]" />
-                <span className="text-xs font-semibold tracking-tight text-slate-700">
-                  Sistema Online
-                </span>
-              </div>
+              <span className="text-xs font-semibold text-slate-500">Acesso da equipe</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -117,13 +113,12 @@ export default function LoginPage() {
                   >
                     Senha de acesso <span className="text-rose-500">*</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setNotice('A recuperação de senha ainda não está disponível.')}
+                  <Link
+                    href="/login/recuperar"
                     className="text-xs font-semibold text-[#0a5f7a] transition-colors hover:text-[#00ba7c]"
                   >
                     Esqueceu sua senha?
-                  </button>
+                  </Link>
                 </div>
                 <div className="relative">
                   <div
@@ -152,19 +147,6 @@ export default function LoginPage() {
                     </span>
                   </button>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between px-1 pt-1">
-                <label className="flex cursor-pointer select-none items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-[#0a5f7a] transition-colors focus:ring-[#0a5f7a]/30 focus:ring-offset-0"
-                  />
-                  <span className="text-xs text-slate-600">Lembrar credencial</span>
-                </label>
-                <span className="rounded-full border border-slate-200/60 bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-400">
-                  Ambiente Seguro
-                </span>
               </div>
 
               {notice && (
