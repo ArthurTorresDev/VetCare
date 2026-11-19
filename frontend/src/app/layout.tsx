@@ -1,15 +1,26 @@
 
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '../context/index';
+import { USER_PREFERENCES_STORAGE_KEY } from '../repositories/index';
 
 export const metadata: Metadata = {
-  title: 'VetCare / MedPet',
+  title: 'VetCare',
   description: 'Sistema de gestão veterinária com agendamento.',
   icons: {
     icon: '/favicon.png',
   },
 };
+
+const themeInitializationScript = `
+  try {
+    const savedTheme = localStorage.getItem(${JSON.stringify(USER_PREFERENCES_STORAGE_KEY)});
+    document.documentElement.dataset.theme = JSON.parse(savedTheme || 'null') === 'dark' ? 'dark' : 'light';
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+  }
+`;
 
 export default function RootLayout({
   children,
@@ -17,8 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-theme="light" suppressHydrationWarning>
       <head>
+        <Script
+          id="theme-initialization"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitializationScript }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

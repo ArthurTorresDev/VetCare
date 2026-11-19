@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/index';
 import { registerUser } from '../../services/auth.service';
+import { VetCareLogo } from '../../components/ui/VetCareLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -87,29 +88,7 @@ export default function LoginPage() {
               <span className="text-xs font-semibold text-slate-500">Acesso da equipe</span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a5f7a] to-[#00ba7c] text-white shadow-lg">
-                <span className="material-symbols-outlined text-[26px]" aria-hidden="true">
-                  pets
-                </span>
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-2xl font-bold tracking-tight text-slate-900">
-                    Vet<span className="text-[#00ba7c]">Care</span>
-                  </span>
-                  <span
-                    className="material-symbols-outlined text-sm font-bold text-[#0a5f7a]"
-                    aria-hidden="true"
-                  >
-                    add
-                  </span>
-                </div>
-                <p className="-mt-0.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-                  Gestão Veterinária
-                </p>
-              </div>
-            </div>
+            <VetCareLogo size="medium" subtitle="Gestão Veterinária" />
           </div>
 
           <div className="my-auto py-6">
@@ -119,7 +98,7 @@ export default function LoginPage() {
               </h1>
               <p className="mt-1.5 text-sm font-normal text-slate-500">
                 {isRegisterMode
-                  ? 'Cadastre-se na equipe clínica MedPet'
+                  ? 'Cadastre-se na equipe clínica VetCare'
                   : 'Acesse o prontuário eletrônico e a rotina clínica'}
               </p>
             </header>
@@ -208,7 +187,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="exemplo@medpet.com.br"
+                    placeholder="exemplo@vetcare.com.br"
                     className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
                   />
                 </div>

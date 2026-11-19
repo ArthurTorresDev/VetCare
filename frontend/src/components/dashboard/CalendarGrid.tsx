@@ -30,6 +30,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
 }) => {
   const colCount = gridDays.length + 1;
   const gridCols = `repeat(${colCount}, minmax(0, 1fr))`;
+  const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
 
   // Mapeamento rápido de feriados por data ISO e data BR
   const holidayMap = React.useMemo(() => {
@@ -59,7 +60,19 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
           return (
             <div
               key={i}
-              className={`py-3 border-r border-slate-200 last:border-r-0 relative transition-colors ${holiday
+              data-calendar-date={dateIso}
+              data-selected={selectedDate === dateIso}
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedDate === dateIso}
+              onClick={() => setSelectedDate(dateIso)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedDate(dateIso);
+                }
+              }}
+              className={`py-3 border-r border-slate-200 last:border-r-0 relative transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 ${holiday
                 ? 'bg-amber-100/40 hover:bg-amber-100/60'
                 : isToday
                   ? 'bg-emerald-500/10'
@@ -122,7 +135,12 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 return (
                   <div
                     key={colIdx}
-                    onClick={() => onSelectSlot(dateIso, hour)}
+                    data-calendar-date={dateIso}
+                    data-selected={selectedDate === dateIso}
+                    onClick={() => {
+                      setSelectedDate(dateIso);
+                      onSelectSlot(dateIso, hour);
+                    }}
                     className={`border-r border-slate-100 last:border-r-0 p-1.5 transition-colors cursor-pointer relative group ${holiday
                       ? 'bg-amber-50/30 hover:bg-amber-100/50'
                       : 'hover:bg-emerald-50/40'
@@ -140,6 +158,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                           key={a.id}
                           onClick={(e) => {
                             e.stopPropagation();
+                            setSelectedDate(dateIso);
                             onSelectAppointment(a);
                           }}
                           className={`rounded-lg p-2 text-xs border ${style.bannerBg} hover:shadow-md transition-shadow cursor-pointer mb-1`}

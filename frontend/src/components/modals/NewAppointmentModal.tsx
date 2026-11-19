@@ -46,7 +46,7 @@ interface NewAppointmentModalProps {
   onSubmit: (e: React.FormEvent) => void;
   tutorInputRef: React.RefObject<HTMLInputElement | null>;
 
-  //Verificação de Feriados & Horários MedPet
+  //Verificação de Feriados & Horários VetCare
   dateCheckResult?: DateCheckResult | null;
   checkingDate?: boolean;
   showHolidayConfirmation?: boolean;

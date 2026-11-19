@@ -16,6 +16,7 @@ import {
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { useAuth } from '../../context/index';
 import { updateCurrentUser } from '../../services/auth.service';
+import { UserPreferencesRepository } from '../../repositories/index';
 
 interface HeaderProps {
   activeTab: TabType;
@@ -46,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const getRoleLabel = (role?: string) => {
     switch (role) {
@@ -79,6 +81,22 @@ export const Header: React.FC<HeaderProps> = ({
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    const currentTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    setTheme(currentTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.classList.add('theme-changing');
+    document.documentElement.dataset.theme = nextTheme;
+    UserPreferencesRepository.setTheme(nextTheme);
+    setTheme(nextTheme);
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('theme-changing');
+    }, 250);
+  };
 
   return (
     <>
@@ -150,94 +168,107 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Perfil & Menu Rápido */}
-        <div className="relative ml-8">
+        <div className="ml-8 flex items-center gap-3">
           <button
-            onClick={() => setIsProfileMenuOpen((v) => !v)}
-            aria-label="Abrir menu do perfil"
-            aria-haspopup="true"
-            aria-expanded={isProfileMenuOpen}
-            aria-controls="profile-menu"
-            className="flex items-center gap-3 hover:bg-slate-50 p-1.5 rounded-full pr-4 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
+            aria-pressed={theme === 'dark'}
+            title={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent text-slate-500 transition-all hover:border-slate-200 hover:bg-slate-50 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center border-2 border-emerald-500 uppercase text-sm">
-              {profile.name ? profile.name.slice(0, 2) : <i className="ph ph-user text-base"></i>}
-            </div>
-
-            <div className="text-left hidden md:block">
-              <p className="text-sm font-semibold text-slate-700 leading-tight">
-                {profile.name || 'Carregando...'}
-              </p>
-              <p className="text-xs text-slate-500">
-                {profile.role}
-              </p>
-            </div>
-
-            <i className="ph ph-caret-down text-slate-400"></i>
+            <i className={`ph ${theme === 'light' ? 'ph-sun' : 'ph-moon'} text-xl`} aria-hidden="true"></i>
           </button>
 
-          {isProfileMenuOpen && (
-            <div
-              id="profile-menu"
-              className="absolute right-0 mt-2 w-64 bg-white border border-slate-100 rounded-xl shadow-xl py-2 z-50"
+          <div className="relative">
+            <button
+              onClick={() => setIsProfileMenuOpen((v) => !v)}
+              aria-label="Abrir menu do perfil"
+              aria-haspopup="true"
+              aria-expanded={isProfileMenuOpen}
+              aria-controls="profile-menu"
+              className="flex items-center gap-3 hover:bg-slate-50 p-1.5 rounded-full pr-4 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
             >
-              <div className="px-4 py-3 border-b border-slate-100">
-                <p className="text-sm font-semibold text-slate-800 leading-tight">
-                  {profile.name}
-                </p>
-                <p className="text-xs text-slate-500 truncate mt-0.5">
-                  {profile.email}
-                </p>
-                <span className="inline-block mt-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[11px] font-medium border border-emerald-200">
-                  {profile.role}
-                </span>
+              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center border-2 border-emerald-500 uppercase text-sm">
+                {profile.name ? profile.name.slice(0, 2) : <i className="ph ph-user text-base"></i>}
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsProfileMenuOpen(false);
-                  setIsProfileModalOpen(true);
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
-              >
-                Visualizar/editar perfil
-              </button>
+              <div className="text-left hidden md:block">
+                <p className="text-sm font-semibold text-slate-700 leading-tight">
+                  {profile.name || 'Carregando...'}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {profile.role}
+                </p>
+              </div>
 
-              <button
-                onClick={() => {
-                  setActiveTab('HISTORICO');
-                  setIsProfileMenuOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
-              >
-                Auditoria de Atividades
-              </button>
+              <i className="ph ph-caret-down text-slate-400"></i>
+            </button>
 
-              <button
-                onClick={() => {
-                  window.open(getExportXmlUrl(), '_blank');
-                  setIsProfileMenuOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
+            {isProfileMenuOpen && (
+              <div
+                id="profile-menu"
+                className="absolute right-0 mt-2 w-64 bg-white border border-slate-100 rounded-xl shadow-xl py-2 z-50"
               >
-                Exportar Relatório XML
-              </button>
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <p className="text-sm font-semibold text-slate-800 leading-tight">
+                    {profile.name}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                    {profile.email}
+                  </p>
+                  <span className="inline-block mt-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[11px] font-medium border border-emerald-200">
+                    {profile.role}
+                  </span>
+                </div>
 
-              <div className="mt-1 border-t border-slate-100 pt-1">
                 <button
                   type="button"
                   onClick={() => {
                     setIsProfileMenuOpen(false);
-                    setIsLogoutDialogOpen(true);
+                    setIsProfileModalOpen(true);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
+                  className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
                 >
-                  <i className="ph ph-sign-out mr-2"></i>
-                  Sair
+                  Visualizar/editar perfil
                 </button>
+
+                <button
+                  onClick={() => {
+                    setActiveTab('HISTORICO');
+                    setIsProfileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
+                >
+                  Auditoria de Atividades
+                </button>
+
+                <button
+                  onClick={() => {
+                    window.open(getExportXmlUrl(), '_blank');
+                    setIsProfileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-emerald-600"
+                >
+                  Exportar Relatório XML
+                </button>
+
+                <div className="mt-1 border-t border-slate-100 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileMenuOpen(false);
+                      setIsLogoutDialogOpen(true);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
+                  >
+                    <i className="ph ph-sign-out mr-2"></i>
+                    Sair
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </header>
 

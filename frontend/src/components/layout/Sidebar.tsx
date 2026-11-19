@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { TabType } from '../../types/index';
+import { VetCareLogo } from '../ui/VetCareLogo';
 
 interface SidebarProps {
   activeTab: TabType;
@@ -12,8 +13,8 @@ const NAV_ITEMS: [TabType, string, string][] = [
   ['DASHBOARD', 'ph-squares-four', 'Agenda'],
   ['CLIENTES', 'ph-users', 'Clientes & Pets'],
   ['SERVICOS', 'ph-stethoscope', 'Serviços'],
-  ['CONSULTAS_REALIZADAS', 'ph-Calendario-check', 'Realizadas'],
-  ['CANCELADAS', 'ph-Calendario-x', 'Canceladas'],
+  ['CONSULTAS_REALIZADAS', 'ph-calendar-check', 'Realizadas'],
+  ['CANCELADAS', 'ph-calendar-x', 'Canceladas'],
   ['RELATORIOS', 'ph-chart-line-up', 'Relatórios XML'],
   ['HISTORICO', 'ph-clock-counter-clockwise', 'Auditoria'],
 ];
@@ -25,10 +26,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="sidebar fixed top-0 left-0 h-screen bg-slate-900 text-white shadow-xl flex flex-col justify-between py-6 overflow-hidden z-50">
       <div>
-        <div className="px-6 mb-8 flex items-center gap-4 text-emerald-400">
-          <i className="ph-fill ph-paw-print text-3xl shrink-0"></i>
-          <span className="sidebar-text font-bold text-xl tracking-wide">VetCare</span>
-        </div>
+        <VetCareLogo
+          size="sidebar"
+          onDarkBackground
+          className="px-6 mb-8"
+          wordmarkClassName="sidebar-text tracking-wide"
+        />
 
         <nav className="flex flex-col gap-1.5 px-3">
           {NAV_ITEMS.map(([tab, icon, label]) => {

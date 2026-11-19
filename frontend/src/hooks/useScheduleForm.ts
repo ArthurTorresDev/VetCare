@@ -30,7 +30,7 @@ export function useScheduleForm(
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [conflictingAppointment, setConflictingAppointment] = useState<any | null>(null);
 
-  // Estados de Feriados Nacionais (Brasil API) e Horários Especiais da MedPet
+  // Estados de Feriados Nacionais (Brasil API) e Horários Especiais da VetCare
   const [dateCheckResult, setDateCheckResult] = useState<DateCheckResult | null>(null);
   const [showHolidayConfirmation, setShowHolidayConfirmation] = useState(false);
   const [checkingDate, setCheckingDate] = useState(false);
@@ -169,7 +169,7 @@ export function useScheduleForm(
         startTime: startIso,
         durationMinutes: Number(duration),
         notes,
-        createdByUser: 'Recepção (MedPet)',
+        createdByUser: 'Recepção (VetCare)',
       });
 
       onSuccess(created);

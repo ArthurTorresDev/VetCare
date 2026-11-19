@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/index';
 import VetCareDashboard from '../components/VetCareDashboard';
+import { VetCareLogo } from '../components/ui/VetCareLogo';
 
 export default function Page() {
   const router = useRouter();
@@ -30,31 +31,8 @@ export default function Page() {
         <div className="relative z-10 w-full max-w-[430px]">
 
           {/* Marca */}
-          <div className="flex items-center justify-center gap-3 mb-12">
-
-            <div className="relative w-12 h-12 bg-[#15965B] rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-900/15">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-7 h-7"
-              >
-                <path d="M12 20.5c-3.7-2.2-7-5.1-7-9.1a4.3 4.3 0 0 1 7-3.3 4.3 4.3 0 0 1 7 3.3c0 4-3.3 6.9-7 9.1Z" />
-                <path d="M9 12h6M12 9v6" />
-              </svg>
-            </div>
-
-            <div>
-              <h1 className="text-[25px] font-extrabold tracking-tight text-[#173D2C] leading-none">
-                VetCare
-              </h1>
-              <p className="text-[10px] tracking-[2.5px] font-semibold text-[#8A9D91] mt-1.5">
-                GESTÃO VETERINÁRIA
-              </p>
-            </div>
+          <div className="mb-12 flex justify-center">
+            <VetCareLogo size="medium" subtitle="Gestão Veterinária" />
           </div>
 
           {/* Card principal */}
