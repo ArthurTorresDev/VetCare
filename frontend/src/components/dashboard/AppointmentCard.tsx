@@ -26,14 +26,14 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
     appointment.serviceCategory === 'CIRURGIA'
       ? 'Cirurgia'
       : appointment.serviceCategory === 'VACINA'
-      ? 'Vacinação'
-      : appointment.serviceCategory === 'CHECKUP'
-      ? 'Checkup'
-      : appointment.serviceCategory === 'RETORNO'
-      ? 'Retorno'
-      : appointment.serviceCategory === 'EMERGENCIA'
-      ? 'Emergência'
-      : 'Consulta';
+        ? 'Vacinação'
+        : appointment.serviceCategory === 'CHECKUP'
+          ? 'Checkup'
+          : appointment.serviceCategory === 'RETORNO'
+            ? 'Retorno'
+            : appointment.serviceCategory === 'EMERGENCIA'
+              ? 'Emergência'
+              : 'Consulta';
 
   return (
     <div
@@ -86,7 +86,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
         {appointment.googleEventId && (
           <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-medium mb-3">
-            <i className="ph ph-calendar-check text-xs"></i>
+            <i className="ph ph-Calendario-check text-xs"></i>
             <span>Google Agenda Sincronizado</span>
           </div>
         )}

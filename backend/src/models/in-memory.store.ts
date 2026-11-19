@@ -6,6 +6,9 @@ import {
   AuditLogEntry,
   EmailNotification,
   User,
+  Veterinario,
+  Atendente,
+  Atendimento,
 } from '@vetcare/shared';
 import {
   initialClients,
@@ -17,13 +20,16 @@ import {
 export class InMemoryStore {
   private static instance: InMemoryStore;
 
-  public clients: Client[] = [];
+  public clientes: Client[] = [];
   public pets: Pet[] = [];
   public services: ClinicService[] = [];
   public appointments: Appointment[] = [];
   public auditLogs: AuditLogEntry[] = [];
   public emailNotifications: EmailNotification[] = [];
   public users: User[] = [];
+  public veterinarios: Veterinario[] = [];
+  public atendentes: Atendente[] = [];
+  public atendimentos: Atendimento[] = [];
 
   private constructor() {
     this.reset();
@@ -37,7 +43,7 @@ export class InMemoryStore {
   }
 
   public reset(): void {
-    this.clients = [...initialClients];
+    this.clientes = [...initialClients];
     this.pets = [...initialPets];
     this.services = [...initialServices];
     this.appointments = createInitialAppointments();
@@ -54,5 +60,56 @@ export class InMemoryStore {
     ];
     this.emailNotifications = [];
     this.users = [];
+
+    // Carga inicial alinhada ao medpet.sql
+    this.veterinarios = [
+      {
+        id: 'v1',
+        nome: 'Dra. Camila Rocha',
+        crmv: 'SP-12345',
+        telefone: '(11) 98765-1111',
+        email: 'camila.rocha@medpet.com',
+        criadoEm: new Date().toISOString(),
+      },
+      {
+        id: 'v2',
+        nome: 'Dr. Carlos Alberto',
+        crmv: 'SP-67890',
+        telefone: '(11) 98765-2222',
+        email: 'carlos.alberto@medpet.com',
+        criadoEm: new Date().toISOString(),
+      },
+    ];
+
+    this.atendentes = [
+      {
+        id: 'a1',
+        nome: 'Ana Paula Santos',
+        email: 'ana.santos@medpet.com',
+        telefone: '(11) 98765-3333',
+        criadoEm: new Date().toISOString(),
+      },
+      {
+        id: 'a2',
+        nome: 'Marcos Vinicius',
+        email: 'marcos.vinicius@medpet.com',
+        telefone: '(11) 98765-4444',
+        criadoEm: new Date().toISOString(),
+      },
+    ];
+
+    this.atendimentos = [
+      {
+        id: 'atend-001',
+        petId: 'p1',
+        veterinarioId: 'v1',
+        atendenteId: 'a1',
+        tipoServico: 'Consulta Clínica Geral',
+        dataHora: new Date(Date.now() + 3600000).toISOString(),
+        status: 'Agendado',
+        observacoes: 'Paciente retorno vacinação',
+        criadoEm: new Date().toISOString(),
+      },
+    ];
   }
 }

@@ -46,7 +46,7 @@ interface NewAppointmentModalProps {
   onSubmit: (e: React.FormEvent) => void;
   tutorInputRef: React.RefObject<HTMLInputElement | null>;
 
-  // Google Calendar / Verificação de Feriados & Horários MedPet
+  //Verificação de Feriados & Horários MedPet
   dateCheckResult?: DateCheckResult | null;
   checkingDate?: boolean;
   showHolidayConfirmation?: boolean;
@@ -451,11 +451,11 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               </div>
             </div>
 
-            {/* Alerta de Feriado e Horário Especial (Google Calendar / MedPet) */}
+            {/* Alerta de Feriado Nacional (Brasil API) e Horário Especial */}
             {checkingDate ? (
               <div className="flex items-center gap-2 text-[11px] text-slate-500 py-1">
                 <i className="ph ph-spinner animate-spin text-emerald-600"></i>
-                <span>Verificando feriados e expediente no Google Agenda...</span>
+                <span>Verificando feriados nacionais e expediente da clínica...</span>
               </div>
             ) : (
               dateCheckResult && dateCheckResult.hasWarning && (
@@ -471,8 +471,8 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
                   </ul>
                   {dateCheckResult.isHoliday && (
                     <div className="flex items-center gap-1 text-[10px] text-amber-700 italic pt-0.5">
-                      <i className="ph ph-google-logo"></i>
-                      <span>Sincronizado com a base oficial de Feriados Nacionais do Google Calendar.</span>
+                      <i className="ph ph-flag-banner"></i>
+                      <span>Feriado Nacional validado com a Brasil API.</span>
                     </div>
                   )}
                 </div>
@@ -527,7 +527,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               {submitting ? (
                 <>
                   <i className="ph ph-spinner animate-spin text-base"></i>
-                  <span>Validando e Sincronizando...</span>
+                  <span>Validando e Salvando...</span>
                 </>
               ) : (
                 <>
@@ -548,7 +548,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
           >
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-amber-200">
               <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3">
-                <i className="ph-fill ph-calendar-x text-2xl"></i>
+                <i className="ph-fill ph-Calendario-x text-2xl"></i>
               </div>
               <h4 className="text-base font-bold text-slate-800 text-center">
                 {dateCheckResult.isHoliday

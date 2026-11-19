@@ -47,9 +47,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, profile, onC
           </button>
         </div>
 
-        <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-          Perfil demonstrativo: as alterações ficam apenas nesta página e não são salvas no
-          servidor.
+        <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-4">
+          Suas alterações são salvas diretamente no perfil do usuário no servidor.
         </p>
 
         <form

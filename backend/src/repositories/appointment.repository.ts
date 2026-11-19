@@ -12,6 +12,18 @@ export class AppointmentRepository {
     this.store = store;
   }
 
+  getClients() {
+    return this.store.clientes;
+  }
+
+  getPets() {
+    return this.store.pets;
+  }
+
+  getServices() {
+    return this.store.services;
+  }
+
   findAll(): Appointment[] {
     return this.store.appointments;
   }
@@ -52,7 +64,7 @@ export class AppointmentRepository {
   }
 
   toDetailedView(appt: Appointment): AppointmentDetailedView {
-    const client = this.store.clients.find((c) => c.id === appt.clientId);
+    const client = this.store.clientes.find((c) => c.id === appt.clientId);
     const pet = this.store.pets.find((p) => p.id === appt.petId);
     const service = this.store.services.find((s) => s.id === appt.serviceId);
 

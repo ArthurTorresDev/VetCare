@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -14,6 +14,7 @@ import { CalendarGrid } from '../dashboard/CalendarGrid';
 import { KPIStatsOverview } from '../dashboard/KPIStatsOverview';
 import { DidacticTipBanner } from '../dashboard/DidacticTipBanner';
 import { FilterToolbar } from '../dashboard/FilterToolbar';
+import { HolidayItem } from '../../services/holiday.service';
 
 interface DashboardTabProps {
   loading: boolean;
@@ -23,6 +24,7 @@ interface DashboardTabProps {
   gridDays: Date[];
   periodFilter: PeriodFilter;
   appointmentsByDateHour: Map<string, AppointmentDetailedView[]>;
+  holidays?: HolidayItem[];
   onSelectAppointment: (appt: AppointmentDetailedView) => void;
   onSelectSlot: (dateIso: string, hourString: string) => void;
   onOpenNewAppointmentModal: () => void;
@@ -36,6 +38,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   gridDays,
   periodFilter,
   appointmentsByDateHour,
+  holidays = [],
   onSelectAppointment,
   onSelectSlot,
   onOpenNewAppointmentModal,
@@ -98,18 +101,19 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
       />
 
       {/* 4. Visualização: Grade vs Cards */}
-      {displayMode === 'CALENDAR_WEEK' ? (
+      {displayMode === 'Calendario_WEEK' ? (
         <CalendarGrid
           gridDays={gridDays}
           periodFilter={periodFilter}
           appointmentsByDateHour={appointmentsByDateHour}
+          holidays={holidays}
           onSelectAppointment={onSelectAppointment}
           onSelectSlot={onSelectSlot}
         />
       ) : filteredAppointments.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 border-dashed p-12 text-center shadow-sm">
           <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
-            <i className="ph ph-calendar-blank text-3xl"></i>
+            <i className="ph ph-Calendario-blank text-3xl"></i>
           </div>
           <h3 className="font-bold text-slate-700 text-base">Nenhum compromisso encontrado</h3>
           <p className="text-slate-400 text-xs mt-1 max-w-sm mx-auto">

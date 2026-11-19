@@ -4,13 +4,7 @@ import type {
   CreateUserData,
   UpdateUserData,
 } from './user.repository.interface.js';
-
-/**
- * Interface mínima para um Pool ou Client PostgreSQL (ex: 'pg' Pool)
- */
-export interface IDbPool {
-  query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
-}
+import { db, type IDbPool } from '../database/db.js';
 
 /**
  * Implementação do repositório de usuários para PostgreSQL.
@@ -28,12 +22,13 @@ export class PostgresUserRepository implements IUserRepository {
   }
 
   private ensureConnected(): IDbPool {
-    if (!this.pool) {
+    const pool = this.pool || db.getPool();
+    if (!pool) {
       throw new Error(
         'Pool PostgreSQL não configurado. Defina a conexão com o banco em DATABASE_URL.',
       );
     }
-    return this.pool;
+    return pool;
   }
 
   public async findById(id: string): Promise<User | null> {
@@ -69,12 +64,23 @@ export class PostgresUserRepository implements IUserRepository {
   public async create(data: CreateUserData): Promise<User> {
     const db = this.ensureConnected();
     const query = `
-      INSERT INTO users (name, email, password_hash, role, phone, is_active)
-      VALUES ($1, LOWER($2), $3, $4, $5, $6)
-      RETURNING id, name, email, password_hash AS "passwordHash",
-                role, phone, is_active AS "isActive",
-                created_at AS "createdAt", updated_at AS "updatedAt",
-                last_login_at AS "lastLoginAt";
+      WITH inserted_user AS (
+        INSERT INTO users (name, email, password_hash, role, phone, is_active)
+        VALUES ($1, LOWER($2), $3, $4, $5, $6)
+        RETURNING id, name, email, password_hash AS "passwordHash",
+                  role, phone, is_active AS "isActive",
+                  created_at AS "createdAt", updated_at AS "updatedAt",
+                  last_login_at AS "lastLoginAt"
+      ),
+      inserted_attendant AS (
+        INSERT INTO atendente (nome, email, telefone)
+        SELECT name, email, phone FROM inserted_user
+        ON CONFLICT (email) DO UPDATE
+        SET nome = EXCLUDED.nome, telefone = EXCLUDED.telefone
+        RETURNING id
+      )
+      SELECT inserted_user.*
+      FROM inserted_user CROSS JOIN inserted_attendant;
     `;
     const result = await db.query<User>(query, [
       data.name.trim(),

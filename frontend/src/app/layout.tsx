@@ -1,5 +1,7 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '../context/index';
 
 export const metadata: Metadata = {
   title: 'VetCare / MedPet',
@@ -9,12 +11,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-BR">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"
@@ -26,7 +36,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script src="https://cdn.tailwindcss.com" async></script>
         <script src="https://unpkg.com/@phosphor-icons/web" async></script>
       </head>
-      <body className="text-slate-800 antialiased bg-slate-50">{children}</body>
+
+      <body className="text-slate-800 antialiased bg-slate-50">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

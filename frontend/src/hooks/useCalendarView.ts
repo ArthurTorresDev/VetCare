@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { PeriodFilter, getDateRange, AppointmentDetailedView } from '@vetcare/shared';
 import { DisplayMode } from '../types/index';
 

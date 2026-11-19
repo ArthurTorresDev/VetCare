@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { ClientWithPets } from '../../types/index';
-import { ClientCard } from '../clients/ClientCard';
+import { ClientCard } from '../clientes/ClientCard';
 
 interface ClientsTabProps {
-  clients: ClientWithPets[];
+  clientes: ClientWithPets[];
   onOpenNewTutorModal: () => void;
   onOpenNewPetModal: (client: ClientWithPets) => void;
   onScheduleForClient: (client: ClientWithPets) => void;
@@ -14,7 +14,7 @@ interface ClientsTabProps {
 }
 
 export const ClientsTab: React.FC<ClientsTabProps> = ({
-  clients,
+  clientes,
   onOpenNewTutorModal,
   onOpenNewPetModal,
   onScheduleForClient,
@@ -37,10 +37,10 @@ export const ClientsTab: React.FC<ClientsTabProps> = ({
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
             <span className="text-xs font-bold text-slate-700 block">
-              {clients.length} tutores
+              {clientes.length} tutores
             </span>
             <span className="text-[11px] text-slate-400">
-              {clients.reduce((acc, c) => acc + c.pets.length, 0)} pets vinculados
+              {clientes.reduce((acc, c) => acc + c.pets.length, 0)} pets vinculados
             </span>
           </div>
 
@@ -53,7 +53,7 @@ export const ClientsTab: React.FC<ClientsTabProps> = ({
         </div>
       </div>
 
-      {clients.length === 0 ? (
+      {clientes.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 border-dashed p-12 text-center">
           <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
             <i className="ph ph-user text-2xl"></i>
@@ -71,7 +71,7 @@ export const ClientsTab: React.FC<ClientsTabProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {clients.map((c) => (
+          {clientes.map((c) => (
             <ClientCard
               key={c.id}
               client={c}

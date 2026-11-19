@@ -4,7 +4,7 @@
 
 import {
   AppointmentStatus,
-  GoogleCalendarSyncStatus,
+  GoogleCalendarioSyncStatus,
   ServiceCategory,
   formatDateBR,
   formatTimeBR,
@@ -13,7 +13,7 @@ import {
 
 export { formatDateBR, formatTimeBR, formatDateTimeBR };
 
-// Mapeamento de cores e rótulos para as categorias de serviços (Estilo VetPal / Google Calendar)
+// Mapeamento de cores e rótulos para as categorias de serviços (Estilo VetPal)
 export const SERVICE_CATEGORY_CONFIG: Record<
   ServiceCategory,
   { label: string; color: string; bgLight: string; textDark: string; border: string }
@@ -113,7 +113,7 @@ export const APPOINTMENT_STATUS_CONFIG: Record<
 
 // Mapeamento de status da integração com a API do Google Agenda
 export const GOOGLE_SYNC_STATUS_CONFIG: Record<
-  GoogleCalendarSyncStatus,
+  GoogleCalendarioSyncStatus,
   { label: string; badgeColor: string; icon: string }
 > = {
   SYNCED: {

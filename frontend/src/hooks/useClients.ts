@@ -5,7 +5,7 @@ import * as clientService from '../services/client.service';
 import * as petService from '../services/pet.service';
 
 export function useClients(initialClients: ClientWithPets[] = []) {
-  const [clients, setClients] = useState<ClientWithPets[]>(initialClients);
+  const [clientes, setClients] = useState<ClientWithPets[]>(initialClients);
   const [loading, setLoading] = useState(false);
 
   const refreshClients = useCallback(async (query?: string) => {
@@ -80,7 +80,7 @@ export function useClients(initialClients: ClientWithPets[] = []) {
   }, []);
 
   return {
-    clients,
+    clientes,
     setClients,
     loading,
     refreshClients,

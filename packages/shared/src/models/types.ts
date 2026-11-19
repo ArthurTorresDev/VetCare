@@ -12,7 +12,46 @@ export type AppointmentStatus =
   | 'CANCELADO'
   | 'NAO_COMPARECEU';
 
-export type GoogleCalendarSyncStatus =
+export type AtendimentoStatus =
+  | 'Agendado'
+  | 'Confirmado'
+  | 'Em Atendimento'
+  | 'Concluído'
+  | 'Cancelado'
+  | string;
+
+// ─── Entidades medpet.sql ─────────────────────────────────────────────────────
+
+export interface Veterinario {
+  id: string;
+  nome: string;
+  crmv: string;
+  telefone?: string;
+  email: string;
+  criadoEm?: string;
+}
+
+export interface Atendente {
+  id: string;
+  nome: string;
+  email: string;
+  telefone?: string;
+  criadoEm?: string;
+}
+
+export interface Atendimento {
+  id: string;
+  petId: string;
+  veterinarioId: string;
+  atendenteId: string;
+  tipoServico: string;
+  dataHora: string;
+  status: string;
+  observacoes?: string;
+  criadoEm?: string;
+}
+
+export type GoogleCalendarioSyncStatus =
   | 'SYNCED'
   | 'PENDING'
   | 'FAILED'
@@ -22,10 +61,11 @@ export type GoogleCalendarSyncStatus =
 
 export type PeriodFilter = 'HOJE' | 'SEMANA' | 'MES' | 'ANO';
 
-// ─── Verificação de Feriados e Disponibilidade (Google Calendar API) ─────────
+// ─── Verificação de Feriados e Disponibilidade (Brasil API) ─────────
 
 export interface DateCheckResult {
   date: string;
+  dateBR?: string;
   time?: string;
   isHoliday: boolean;
   holidayName?: string;
@@ -44,6 +84,8 @@ export interface Client {
   phone: string;
   email: string;
   cpf?: string;
+  whatsapp?: string;
+  endereco?: string;
   createdAt: string;
 }
 
@@ -51,11 +93,13 @@ export interface Pet {
   id: string;
   clientId: string;
   name: string;
-  species: 'Cão' | 'Gato' | 'Ave' | 'Outro';
+  species: 'Cão' | 'Gato' | 'Ave' | 'Outro' | string;
   breed: string;
-  sex?: 'Macho' | 'Fêmea';
+  sex?: 'Macho' | 'Fêmea' | string;
   birthDate?: string;
   weightKg?: number;
+  fotoUrl?: string;
+  alergiasMedicamentos?: string;
   notes?: string;
 }
 
@@ -92,8 +136,8 @@ export interface Appointment {
   status: AppointmentStatus;
   notes?: string;
   googleEventId?: string;
-  googleCalendarHtmlLink?: string;
-  googleSyncStatus: GoogleCalendarSyncStatus;
+  googleCalendarioHtmlLink?: string;
+  googleSyncStatus: GoogleCalendarioSyncStatus;
   googleSyncError?: string;
   createdByUser?: string;
   createdAt: string;

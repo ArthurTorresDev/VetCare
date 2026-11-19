@@ -3,7 +3,6 @@ import {
   calculateEndTime,
   isOverlapping,
   hasScheduleConflict,
-  formatGoogleCalendarEventPayload,
   generateAppointmentsXml,
   formatDateBR,
   filterClientsByPrefix,
@@ -90,26 +89,9 @@ describe('Regras de Negócio de Agendamento (Domínio VetCare)', () => {
     expect(check2.hasConflict).toBe(false);
   });
 
-  it('deve formatar o payload do evento para o Google Calendar com dados da clínica', () => {
-    const payload = formatGoogleCalendarEventPayload({
-      appointmentId: 'apt-123',
-      clientName: 'Arthur Steiner',
-      clientPhone: '(11) 99999-8888',
-      petName: 'Thor',
-      serviceName: 'Consulta Geral e Vacinação',
-      veterinarianName: 'Dr. Lucas Mendes',
-      startTime: '2026-11-25T14:00:00.000Z',
-      endTime: '2026-11-25T14:45:00.000Z',
-      notes: 'Pet dócil, trazer carteirinha anterior.',
-    });
-
-    expect(payload.summary).toBe(
-      '[MedPet] Consulta Geral e Vacinação: Thor (Tutor: Arthur Steiner)',
-    );
-    expect(payload.description).toContain('PACIENTE: Thor');
-    expect(payload.description).toContain('TUTOR: Arthur Steiner (Tel: (11) 99999-8888)');
-    expect(payload.description).toContain('ID SISTEMA MEDPET: apt-123');
-    expect(payload.start.timeZone).toBe('America/Sao_Paulo');
+  it('deve formatar data no padrão brasileiro DD/MM/AAAA', () => {
+    const formatted = formatDateBR('2026-11-20T10:00:00.000Z');
+    expect(formatted).toBe('20/11/2026');
   });
 
   it('deve gerar relatório estruturado em formato XML válido com os dados clínicos', () => {

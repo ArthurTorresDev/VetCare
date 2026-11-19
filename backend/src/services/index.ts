@@ -1,5 +1,4 @@
 export * from './auth.service.js';
-export * from './google-calendar.service.js';
 export * from './hash.service.js';
 export * from './holiday.service.js';
 export * from './notification.service.js';

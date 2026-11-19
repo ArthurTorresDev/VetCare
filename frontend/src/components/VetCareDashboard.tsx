@@ -5,9 +5,10 @@ import {
   AuditLogEntry,
   EmailNotification,
 } from '@vetcare/shared';
-import { TabType, GoogleStatusResponse } from '../types/index';
+import { TabType } from '../types/index';
 import { TAB_LABELS, TAB_SUBTITLES } from '../config/constants';
 import { loadInitialAppData } from '../services/api.service';
+import { HolidayItem } from '../services/holiday.service';
 
 // Hooks (Controllers)
 import { useAppointments } from '../hooks/useAppointments';
@@ -40,7 +41,7 @@ import { ServiceModal } from './modals/ServiceModal';
 export default function VetCareDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('DASHBOARD');
   const [searchQuery, setSearchQuery] = useState('');
-  const [googleStatus, setGoogleStatus] = useState<GoogleStatusResponse | null>(null);
+  const [holidays, setHolidays] = useState<HolidayItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [notifications, setNotifications] = useState<EmailNotification[]>([]);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
@@ -58,7 +59,7 @@ export default function VetCareDashboard() {
   } = useAppointments();
 
   // Hook: Clientes e Pets
-  const { clients, setClients, addClient, addPet } = useClients();
+  const { clientes, setClients, addClient, addPet } = useClients();
 
   // Hook: Catálogo de Serviços (Req 3.3)
   const {
@@ -83,11 +84,11 @@ export default function VetCareDashboard() {
     try {
       const data = await loadInitialAppData();
       setAppointments(data.appointments);
-      setClients(data.clients);
+      setClients(data.clientes);
       setServices(data.services);
       setAuditLogs(data.auditLogs);
       setNotifications(data.notifications);
-      setGoogleStatus(data.googleStatus);
+      setHolidays(data.holidays || []);
     } catch (err) {
       console.error('[VetCare Init Error]', err);
     } finally {
@@ -100,7 +101,7 @@ export default function VetCareDashboard() {
   }, [loadData]);
 
   // Hook: Formulário de Agendamento
-  const scheduleForm = useScheduleForm(clients, services, async (created) => {
+  const scheduleForm = useScheduleForm(clientes, services, async (created) => {
     setAppointments((prev) => [created, ...prev]);
     // Recarrega auditoria e notificações
     loadData();
@@ -129,7 +130,6 @@ export default function VetCareDashboard() {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        googleStatus={googleStatus}
       />
 
       {/* ÁREA PRINCIPAL */}
@@ -145,7 +145,6 @@ export default function VetCareDashboard() {
           displayMode={displayMode}
           setDisplayMode={setDisplayMode}
           onOpenNewAppointmentModal={() => scheduleForm.openModal()}
-          googleStatus={googleStatus}
         />
 
         {/* CONTEÚDO PRINCIPAL DA ABA */}
@@ -168,6 +167,7 @@ export default function VetCareDashboard() {
               gridDays={gridDays}
               periodFilter={periodFilter}
               appointmentsByDateHour={appointmentsByDateHour}
+              holidays={holidays}
               onSelectAppointment={(a) => setSelectedAppointment(a)}
               onSelectSlot={(dateIso, hour) => scheduleForm.openModal(dateIso, hour)}
               onOpenNewAppointmentModal={() => scheduleForm.openModal()}
@@ -176,7 +176,7 @@ export default function VetCareDashboard() {
 
           {activeTab === 'CLIENTES' && (
             <ClientsTab
-              clients={clients}
+              clientes={clientes}
               onOpenNewTutorModal={tutorForm.openModal}
               onOpenNewPetModal={petForm.openForTutor}
               onScheduleForClient={(client) => {
@@ -212,9 +212,6 @@ export default function VetCareDashboard() {
 
           {activeTab === 'HISTORICO' && <AuditTab logs={auditLogs} />}
 
-          {activeTab === 'NOTIFICACOES' && (
-            <NotificationsTab notifications={notifications} />
-          )}
         </div>
       </main>
 

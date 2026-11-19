@@ -1,3 +1,12 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { config as loadDotenv } from 'dotenv';
+
+const envFile = [resolve(process.cwd(), '.env'), resolve(process.cwd(), '../.env')].find(existsSync);
+if (envFile) {
+  loadDotenv({ path: envFile });
+}
+
 /**
  * Configuração centralizada de variáveis de ambiente com validação e defaults seguros
  */
@@ -17,11 +26,7 @@ export const env = {
   rateLimitMaxRequests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 10, // 10 tentativas por janela para auth
 
   // Banco de Dados
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/vetcare',
-
-  // Integrações
-  googleCalendarId: process.env.GOOGLE_CALENDAR_ID || '',
-  googleCalendarAccessToken: process.env.GOOGLE_CALENDAR_ACCESS_TOKEN || '',
+  databaseUrl: process.env.DATABASE_URL,
 
   // CORS
   allowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')

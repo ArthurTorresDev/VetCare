@@ -31,7 +31,7 @@ out/
 # ==========================================
 # 3. Credenciais, Chaves de API & Certificados
 # ==========================================
-# Google Cloud / Google Calendar (OAuth & Service Accounts)
+# Google Cloud / Google Calendario (OAuth & Service Accounts)
 *credentials*.json
 *service-account*.json
 *client_secret*.json
@@ -107,3 +107,4 @@ desktop.ini
 # 8. Documentos Internos / Regras de Negócio
 # ==========================================
 Regras de Negócio/
+sync-branches.sh
