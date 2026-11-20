@@ -1,4 +1,4 @@
-export const openApiSpec = {
+﻿export const openApiSpec = {
   openapi: '3.0.3',
   info: {
     title: 'VetCare API - Sistema de Autenticação e Gerenciamento de Usuários',
@@ -140,7 +140,7 @@ export const openApiSpec = {
           nome: { type: 'string', example: 'Dra. Camila Rocha' },
           crmv: { type: 'string', example: 'SP-12345' },
           telefone: { type: 'string', example: '(11) 98765-1111' },
-          email: { type: 'string', format: 'email', example: 'camila.rocha@medpet.com' },
+          email: { type: 'string', format: 'email', example: 'camila.rocha@vetcare.com' },
           criadoEm: { type: 'string', format: 'date-time' },
         },
       },
@@ -149,7 +149,7 @@ export const openApiSpec = {
         properties: {
           id: { type: 'string', format: 'uuid', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' },
           nome: { type: 'string', example: 'Ana Paula Santos' },
-          email: { type: 'string', format: 'email', example: 'ana.santos@medpet.com' },
+          email: { type: 'string', format: 'email', example: 'ana.santos@vetcare.com' },
           telefone: { type: 'string', example: '(11) 98765-3333' },
           criadoEm: { type: 'string', format: 'date-time' },
         },
@@ -173,36 +173,36 @@ export const openApiSpec = {
   paths: {
     '/veterinarios': {
       get: {
-        tags: ['Veterinários (medpet.sql)'],
+        tags: ['Veterinários (vetcare.sql)'],
         summary: 'Listar corpo clínico veterinário',
         responses: { 200: { description: 'Lista de veterinários' } },
       },
       post: {
-        tags: ['Veterinários (medpet.sql)'],
+        tags: ['Veterinários (vetcare.sql)'],
         summary: 'Cadastrar veterinário',
         responses: { 201: { description: 'Veterinário criado' } },
       },
     },
     '/atendentes': {
       get: {
-        tags: ['Atendentes (medpet.sql)'],
+        tags: ['Atendentes (vetcare.sql)'],
         summary: 'Listar atendentes e recepção',
         responses: { 200: { description: 'Lista de atendentes' } },
       },
       post: {
-        tags: ['Atendentes (medpet.sql)'],
+        tags: ['Atendentes (vetcare.sql)'],
         summary: 'Cadastrar atendente',
         responses: { 201: { description: 'Atendente criado' } },
       },
     },
     '/atendimentos': {
       get: {
-        tags: ['Atendimentos (medpet.sql)'],
+        tags: ['Atendimentos (vetcare.sql)'],
         summary: 'Listar atendimentos clínicos',
         responses: { 200: { description: 'Lista de atendimentos' } },
       },
       post: {
-        tags: ['Atendimentos (medpet.sql)'],
+        tags: ['Atendimentos (vetcare.sql)'],
         summary: 'Registrar atendimento clínico',
         responses: { 201: { description: 'Atendimento registrado' } },
       },

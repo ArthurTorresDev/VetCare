@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { SchedulingService } from '../services/scheduling.service.js';
 
 export class AppointmentController {
@@ -34,15 +34,34 @@ export class AppointmentController {
     res.json(stats);
   };
 
+  checkConflict = (req: Request, res: Response) => {
+    const { startTime, durationMinutes, ignoreAppointmentId } = req.query;
+    if (!startTime) {
+      return res.status(400).json({ error: 'startTime é obrigatório para checar conflitos.' });
+    }
+    const duration = Number(durationMinutes) || 30;
+    const result = this.service.checkConflict(
+      String(startTime),
+      duration,
+      ignoreAppointmentId ? String(ignoreAppointmentId) : undefined,
+    );
+    res.json(result);
+  };
+
   create = async (req: Request, res: Response) => {
     try {
-      const created = await this.service.createAppointment(req.body);
-      res.status(201).json(created);
+      const result = await this.service.createAppointment(req.body);
+      // Sempre retorna o agendamento criado com status 201.
+      // Se houver sobreposição, anexa o warning e conflict informativos.
+      res.status(201).json({
+        ...result.appointment,
+        warning: result.warning,
+        conflict: result.conflict,
+      });
     } catch (err: any) {
       const status = err.statusCode || 400;
       res.status(status).json({
         error: err.message || 'Erro ao processar agendamento',
-        conflictingAppointment: err.conflictingAppointment,
       });
     }
   };
@@ -50,13 +69,16 @@ export class AppointmentController {
   update = async (req: Request, res: Response) => {
     const id = String(req.params.id);
     try {
-      const updated = await this.service.updateAppointment(id, req.body);
-      res.json(updated);
+      const result = await this.service.updateAppointment(id, req.body);
+      res.json({
+        ...result.appointment,
+        warning: result.warning,
+        conflict: result.conflict,
+      });
     } catch (err: any) {
       const statusCode = err.statusCode || 400;
       res.status(statusCode).json({
         error: err.message || 'Erro ao atualizar agendamento',
-        conflictingAppointment: err.conflictingAppointment,
       });
     }
   };
@@ -105,7 +127,7 @@ export class AppointmentController {
     res.header('Content-Type', 'application/xml');
     res.header(
       'Content-Disposition',
-      'attachment; filename="relatorio_agendamentos_medpet.xml"',
+      'attachment; filename="relatorio_agendamentos_vetcare.xml"',
     );
     res.send(xml);
   };

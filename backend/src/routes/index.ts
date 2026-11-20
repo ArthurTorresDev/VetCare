@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import healthRoutes from './health.routes.js';
 import clientRoutes from './client.routes.js';
 import petRoutes from './pet.routes.js';
@@ -22,7 +22,7 @@ apiRouter.use(docsRoutes);
 apiRouter.use(authRoutes);
 apiRouter.use(userRoutes);
 
-// Rotas de Domínio da Clínica e medpet.sql
+// Rotas de Domínio da Clínica e vetcare.sql
 apiRouter.use(healthRoutes);
 apiRouter.use(clientRoutes);
 apiRouter.use(petRoutes);

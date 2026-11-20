@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { ServiceRepository } from '../repositories/service.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
+import { ServiceCategory } from '@vetcare/shared';
 
 export class ServiceController {
   private serviceRepo: ServiceRepository;
@@ -26,43 +27,48 @@ export class ServiceController {
   };
 
   create = (req: Request, res: Response) => {
-    const {
-      name,
-      category,
-      durationMinutes,
-      price,
-      colorHex,
-      description,
-      isActive,
-      requiredProfessional,
-      requiredResource,
-      instructions,
-    } = req.body;
+    // Requisito estrito: cadastro recebe exclusivamente nome, categoria, duracao_minutos (ou durationMinutes / duracaoMinutos)
+    const nome = req.body.nome || req.body.name;
+    const categoria = req.body.categoria || req.body.category;
+    const duracaoRaw = req.body.duracao_minutos !== undefined ? req.body.duracao_minutos : (req.body.durationMinutes || req.body.duracaoMinutos);
 
-    if (!name || !category || !durationMinutes) {
+    if (!nome || typeof nome !== 'string' || !nome.trim()) {
       return res.status(400).json({
-        error: 'Nome, categoria e duração padrão são obrigatórios para o serviço.',
+        error: 'O campo nome (string) é obrigatório.',
+      });
+    }
+
+    if (!categoria || typeof categoria !== 'string' || !categoria.trim()) {
+      return res.status(400).json({
+        error: 'O campo categoria (string) é obrigatório.',
+      });
+    }
+
+    const duracaoMinutos = Number(duracaoRaw);
+    if (duracaoRaw === undefined || !Number.isInteger(duracaoMinutos) || duracaoMinutos <= 0) {
+      return res.status(400).json({
+        error: 'O campo duracao_minutos deve ser um número inteiro positivo.',
       });
     }
 
     const created = this.serviceRepo.create({
-      name,
-      category,
-      durationMinutes: Number(durationMinutes),
-      price: price ? Number(price) : 0,
-      colorHex: colorHex || '#0284c7',
-      description,
-      isActive: isActive !== false,
-      requiredProfessional,
-      requiredResource,
-      instructions,
+      name: nome.trim(),
+      category: categoria.trim() as ServiceCategory,
+      durationMinutes: duracaoMinutos,
+      price: req.body.price ? Number(req.body.price) : 0,
+      colorHex: req.body.colorHex || '#0284c7',
+      description: req.body.description,
+      isActive: req.body.isActive !== false,
+      requiredProfessional: req.body.requiredProfessional,
+      requiredResource: req.body.requiredResource,
+      instructions: req.body.instructions,
     });
 
     this.auditRepo.log({
       action: 'CREATE',
       targetId: created.id,
       targetType: 'SERVICE',
-      user: 'Administração MedPet',
+      user: 'Administração VetCare',
       details: `Novo serviço cadastrado: ${created.name} (${created.durationMinutes} min)`,
     });
 
@@ -71,7 +77,25 @@ export class ServiceController {
 
   update = (req: Request, res: Response) => {
     const id = String(req.params.id);
-    const updated = this.serviceRepo.update(id, req.body);
+    const existing = this.serviceRepo.findById(id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Serviço não encontrado.' });
+    }
+
+    const updates: any = { ...req.body };
+    if (req.body.nome !== undefined) updates.name = req.body.nome;
+    if (req.body.categoria !== undefined) updates.category = req.body.categoria;
+    if (req.body.duracao_minutos !== undefined) {
+      const d = Number(req.body.duracao_minutos);
+      if (!Number.isInteger(d) || d <= 0) {
+        return res.status(400).json({
+          error: 'O campo duracao_minutos deve ser um número inteiro positivo.',
+        });
+      }
+      updates.durationMinutes = d;
+    }
+
+    const updated = this.serviceRepo.update(id, updates);
     if (!updated) {
       return res.status(404).json({ error: 'Serviço não encontrado.' });
     }
@@ -80,7 +104,7 @@ export class ServiceController {
       action: 'UPDATE_STATUS',
       targetId: id,
       targetType: 'SERVICE',
-      user: 'Administração MedPet',
+      user: 'Administração VetCare',
       details: `Serviço clínico atualizado: ${updated.name}`,
     });
 
@@ -99,7 +123,7 @@ export class ServiceController {
       action: 'CANCEL',
       targetId: id,
       targetType: 'SERVICE',
-      user: 'Administração MedPet',
+      user: 'Administração VetCare',
       details: `Serviço ${service.name} removido do catálogo.`,
     });
 

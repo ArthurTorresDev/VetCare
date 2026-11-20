@@ -13,7 +13,7 @@ export const ReportsTab: React.FC = () => {
       <p className="text-slate-500 text-sm mt-1 mb-6">
         Faça o download do arquivo XML contendo todos os registros de agendamentos, dados de
         tutores, histórico de pacientes conforme os padrões
-        da clínica MedPet.
+        da clínica VetCare.
       </p>
       <button
         onClick={() => window.open(getExportXmlUrl(), '_blank')}

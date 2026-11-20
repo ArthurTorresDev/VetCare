@@ -1,3 +1,5 @@
+﻿//REMOVER QUANDO LANÇAR O SISTEMA (MOCK DE DADOS INICIAL PARA TESTES)
+
 import { Client, Pet, ClinicService, Appointment } from '@vetcare/shared';
 
 export const initialClients: Client[] = [
@@ -204,7 +206,7 @@ export function createInitialAppointments(): Appointment[] {
       googleEventId: 'gcal_init_001',
       googleCalendarioHtmlLink: 'https://Calendario.google.com',
       googleSyncStatus: 'SYNCED',
-      createdByUser: 'Recepção (MedPet)',
+      createdByUser: 'Recepção (VetCare)',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -221,7 +223,7 @@ export function createInitialAppointments(): Appointment[] {
       googleEventId: 'gcal_init_002',
       googleCalendarioHtmlLink: 'https://Calendario.google.com',
       googleSyncStatus: 'SYNCED',
-      createdByUser: 'Recepção (MedPet)',
+      createdByUser: 'Recepção (VetCare)',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -238,7 +240,7 @@ export function createInitialAppointments(): Appointment[] {
       googleEventId: 'gcal_init_003',
       googleCalendarioHtmlLink: 'https://Calendario.google.com',
       googleSyncStatus: 'SYNCED',
-      createdByUser: 'Recepção (MedPet)',
+      createdByUser: 'Recepção (VetCare)',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },

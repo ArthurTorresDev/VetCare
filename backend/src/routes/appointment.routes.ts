@@ -6,6 +6,7 @@ const controller = new AppointmentController();
 
 router.get('/appointments/stats/kpi', controller.getKPIStats);
 router.get('/appointments/export/xml', controller.exportXml);
+router.get('/appointments/check-conflict', controller.checkConflict);
 router.get('/appointments', controller.list);
 router.post('/appointments', controller.create);
 router.get('/appointments/:id', controller.getById);

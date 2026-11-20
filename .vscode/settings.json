@@ -6,8 +6,8 @@
             "server": "localhost",
             "port": 5432,
             "driver": "PostgreSQL",
-            "database": "VetCare",
             "name": "VetCare",
+            "database": "VetCare",
             "username": "postgres"
         }
     ]

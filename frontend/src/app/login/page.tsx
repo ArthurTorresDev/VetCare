@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
@@ -119,7 +119,7 @@ export default function LoginPage() {
               </h1>
               <p className="mt-1.5 text-sm font-normal text-slate-500">
                 {isRegisterMode
-                  ? 'Cadastre-se na equipe clínica MedPet'
+                  ? 'Cadastre-se na equipe clínica VetCare'
                   : 'Acesse o prontuário eletrônico e a rotina clínica'}
               </p>
             </header>
@@ -204,7 +204,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="exemplo@medpet.com.br"
+                    placeholder="exemplo@vetcare.com.br"
                     className="w-full rounded-xl border border-slate-200/80 bg-slate-50/80 py-3 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 hover:bg-slate-50 focus:border-[#0a5f7a] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#0a5f7a]/15"
                   />
                 </div>

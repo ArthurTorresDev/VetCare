@@ -1,4 +1,4 @@
-# Documentação Arquitetural Completa — VetCare (MedPet)
+﻿# Documentação Arquitetural Completa — VetCare (VetCare)
 
 > **Versão do Sistema:** 2.0.0 (Modular Monorepo)  
 > **Classificação:** Documentação Técnica de Arquitetura e Engenharia de Software  
@@ -9,7 +9,7 @@
 
 ## 1. Visão Geral Executiva
 
-O **VetCare** (sistema interno MedPet) é uma plataforma web para gestão clínica, operacional, controle de estoque e agendamento veterinário. O sistema foi desenvolvido com prioridade para estações de trabalho desktop e notebooks, garantindo ergonomia para atendentes e veterinários, alta responsividade e total conformidade com o padrão brasileiro de datas, horários e moeda.
+O **VetCare** (sistema interno VetCare) é uma plataforma web para gestão clínica, operacional, controle de estoque e agendamento veterinário. O sistema foi desenvolvido com prioridade para estações de trabalho desktop e notebooks, garantindo ergonomia para atendentes e veterinários, alta responsividade e total conformidade com o padrão brasileiro de datas, horários e moeda.
 
 ### Objetivos Primordiais
 1. **Centralização Operacional:** Eliminar o uso disperso de cadernos, planilhas e mensagens de texto, consolidando clientes, animais, catálogo de procedimentos e auditoria em uma base consistente.
@@ -286,5 +286,5 @@ npm run build
 ```
 
 ---
-*Documentação gerada e validada para a arquitetura do projeto VetCare / MedPet.*
+*Documentação gerada e validada para a arquitetura do projeto VetCare / VetCare.*
 

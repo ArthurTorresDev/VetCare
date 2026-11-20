@@ -1,5 +1,5 @@
-/**
- * @vetcare/ui - Design Tokens, Helpers e Componentes Visuais do Sistema VetCare / MedPet
+﻿/**
+ * @vetcare/ui - Design Tokens, Helpers e Componentes Visuais do Sistema VetCare / VetCare
  */
 
 import {

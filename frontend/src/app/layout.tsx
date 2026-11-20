@@ -1,10 +1,10 @@
-
+﻿
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '../context/index';
 
 export const metadata: Metadata = {
-  title: 'VetCare / MedPet',
+  title: 'VetCare / VetCare',
   description: 'Sistema de gestão veterinária com agendamento.',
   icons: {
     icon: '/favicon.png',

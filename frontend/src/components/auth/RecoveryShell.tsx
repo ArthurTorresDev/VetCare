@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 
 interface RecoveryShellProps {
   step: 1 | 2 | 3;
@@ -17,7 +17,7 @@ export function RecoveryShell({ step, children }: RecoveryShellProps) {
         <a
           href="/login"
           className="flex items-center gap-2.5"
-          aria-label="MedPet - voltar ao login"
+          aria-label="VetCare - voltar ao login"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#0a5f7a] to-[#00ba7c] text-white shadow-sm">
             <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
@@ -56,7 +56,7 @@ export function RecoveryShell({ step, children }: RecoveryShellProps) {
       </div>
 
       <footer className="relative z-10 border-t border-slate-200/70 bg-white/60 px-6 py-4 text-center text-xs text-slate-500 backdrop-blur-md">
-        MedPet · Gestão Veterinária
+        VetCare · Gestão Veterinária
       </footer>
     </main>
   );

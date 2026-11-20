@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { ClientRepository } from '../repositories/client.repository.js';
 import { PetRepository } from '../repositories/pet.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
@@ -55,7 +55,7 @@ export class ClientController {
       action: 'CREATE',
       targetId: created.id,
       targetType: 'CLIENT',
-      user: 'Recepção (MedPet)',
+      user: 'Recepção (VetCare)',
       details: `Novo tutor cadastrado: ${created.name} (${created.phone})`,
     });
 
@@ -73,7 +73,7 @@ export class ClientController {
       action: 'UPDATE_STATUS',
       targetId: id,
       targetType: 'CLIENT',
-      user: 'Recepção (MedPet)',
+      user: 'Recepção (VetCare)',
       details: `Dados do tutor ${updated.name} atualizados.`,
     });
 
@@ -92,7 +92,7 @@ export class ClientController {
       action: 'CANCEL',
       targetId: id,
       targetType: 'CLIENT',
-      user: 'Recepção (MedPet)',
+      user: 'Recepção (VetCare)',
       details: `Tutor ${client.name} excluído do sistema.`,
     });
 
@@ -132,7 +132,7 @@ export class ClientController {
       action: 'CREATE',
       targetId: created.id,
       targetType: 'PET',
-      user: 'Recepção (MedPet)',
+      user: 'Recepção (VetCare)',
       details: `Novo animal cadastrado: ${created.name} (${created.species} - ${created.breed}) para o tutor ${client.name}`,
     });
 

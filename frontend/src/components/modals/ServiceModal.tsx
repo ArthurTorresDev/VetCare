@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { ClinicService, ServiceCategory } from '@vetcare/shared';
@@ -62,7 +62,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
           <div>
             <h3 className="text-lg font-bold text-slate-800">Novo Serviço Clínico</h3>
             <p className="text-xs text-slate-400">
-              Gerencie catálogo, duração padrão e recursos da MedPet
+              Gerencie catálogo, duração padrão e recursos da VetCare
             </p>
           </div>
           <button

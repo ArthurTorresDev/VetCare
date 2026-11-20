@@ -26,10 +26,12 @@ export class PetRepository {
       clientId: petData.clientId,
       name: petData.name.trim(),
       species: petData.species,
-      breed: petData.breed.trim() || 'SRD (Sem Raça Definida)',
+      breed: petData.breed?.trim() || 'SRD (Sem Raça Definida)',
       sex: petData.sex,
       birthDate: petData.birthDate,
       weightKg: petData.weightKg,
+      fotoUrl: petData.fotoUrl,
+      alergiasMedicamentos: petData.alergiasMedicamentos,
       notes: petData.notes?.trim(),
     };
     this.store.pets.push(newPet);
@@ -45,6 +47,8 @@ export class PetRepository {
       ...updates,
       name: updates.name ? updates.name.trim() : this.store.pets[index].name,
       breed: updates.breed ? updates.breed.trim() : this.store.pets[index].breed,
+      fotoUrl: updates.fotoUrl !== undefined ? updates.fotoUrl : this.store.pets[index].fotoUrl,
+      alergiasMedicamentos: updates.alergiasMedicamentos !== undefined ? updates.alergiasMedicamentos : this.store.pets[index].alergiasMedicamentos,
       notes: updates.notes !== undefined ? updates.notes?.trim() : this.store.pets[index].notes,
     };
     return this.store.pets[index];

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Appointment,
   AppointmentDetailedView,
   AppointmentStatus,
@@ -18,6 +18,7 @@ import { PetRepository } from '../repositories/pet.repository.js';
 import { ServiceRepository } from '../repositories/service.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 import { NotificationService } from './notification.service.js';
+import { getSupabaseClient } from './supabase.service.js';
 
 export class SchedulingService {
   private appointmentRepo: AppointmentRepository;
@@ -85,7 +86,23 @@ export class SchedulingService {
     return calculateAppointmentStats(all);
   }
 
-  async createAppointment(dto: CreateAppointmentDTO): Promise<AppointmentDetailedView> {
+  /**
+   * Checa conflito de horário sem bloquear o salvamento.
+   * Retorna objeto com informações de sobreposição caso exista.
+   */
+  checkConflict(
+    startTimeIso: string,
+    durationMinutes: number,
+    ignoreAppointmentId?: string,
+  ): { hasConflict: boolean; conflictingWith?: Appointment } {
+    const endTime = calculateEndTime(startTimeIso, durationMinutes);
+    const existing = this.appointmentRepo.findAll();
+    return hasScheduleConflict(existing, startTimeIso, endTime, ignoreAppointmentId);
+  }
+
+  async createAppointment(
+    dto: CreateAppointmentDTO,
+  ): Promise<{ appointment: AppointmentDetailedView; warning?: string; conflict?: any }> {
     if (!dto.clientId || !dto.petId || !dto.serviceId || !dto.startTime) {
       throw new Error(
         'Campos obrigatórios ausentes: clientId, petId, serviceId e startTime são necessários.',
@@ -110,23 +127,22 @@ export class SchedulingService {
     const duration = dto.durationMinutes || service.durationMinutes;
     const endTime = calculateEndTime(dto.startTime, duration);
 
-    // 1. Verificação de conflitos de horário
+    // 1. Verificação de conflitos de horário com aviso INFORMATIVO (não bloqueante)
     const existing = this.appointmentRepo.findAll();
     const conflictCheck = hasScheduleConflict(existing, dto.startTime, endTime);
+    let warning: string | undefined;
+    let conflictData: any | undefined;
+
     if (conflictCheck.hasConflict) {
-      const err: any = new Error(
-        'Conflito de horário detectado! Já existe outro atendimento marcado neste intervalo.',
-      );
-      err.statusCode = 409;
-      err.conflictingAppointment = conflictCheck.conflictingWith;
-      throw err;
+      warning = 'Alerta Informativo: Existe outro agendamento no mesmo intervalo de horário.';
+      conflictData = conflictCheck.conflictingWith;
     }
 
     const appointmentId = `apt-${Date.now()}`;
     const veterinarianName = dto.veterinarianName || 'Veterinário(a) Clínico';
-    const user = dto.createdByUser || 'Recepção (MedPet)';
+    const user = dto.createdByUser || 'Recepção (VetCare)';
 
-    // Persistência
+    // Persistência local/memória
     const newAppointment: Appointment = {
       id: appointmentId,
       clientId: dto.clientId,
@@ -137,6 +153,7 @@ export class SchedulingService {
       endTime,
       status: 'AGENDADO',
       notes: dto.notes,
+      googleSyncStatus: 'SYNCED',
       createdByUser: user,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -144,13 +161,32 @@ export class SchedulingService {
 
     const saved = this.appointmentRepo.create(newAppointment);
 
+    // Integração com Supabase real na tabela `atendimento` (quando configurado)
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        await supabase.from('atendimento').insert({
+          id: appointmentId,
+          pet_id: dto.petId,
+          veterinario_id: '00000000-0000-0000-0000-000000000000', // Referência padrão caso não haja UUID de veterinário
+          atendente_id: '00000000-0000-0000-0000-000000000000', // Atendente padrão
+          tipo_servico: service.name,
+          data_hora: dto.startTime,
+          status: 'Agendado',
+          observacoes: dto.notes,
+        });
+      } catch (sbErr) {
+        console.warn('[Supabase Atendimento Insert Warning]:', sbErr);
+      }
+    }
+
     // 4. Auditoria
     this.auditRepo.log({
       action: 'CREATE',
       targetId: appointmentId,
       targetType: 'APPOINTMENT',
       user,
-      details: `Agendamento criado para ${pet.name} (Tutor: ${client.name}) em ${formatDateBR(dto.startTime)} às ${formatTimeBR(dto.startTime)}`,
+      details: `Agendamento criado para ${pet.name} (Tutor: ${client.name}) em ${formatDateBR(dto.startTime)} às ${formatTimeBR(dto.startTime)}${conflictCheck.hasConflict ? ' [COM CONFLITO REGISTRADO]' : ''}`,
     });
 
     // 5. Notificação por E-mail
@@ -163,13 +199,17 @@ export class SchedulingService {
       );
     }
 
-    return saved;
+    return {
+      appointment: saved,
+      warning,
+      conflict: conflictData,
+    };
   }
 
   async updateAppointment(
     id: string,
     dto: UpdateAppointmentDTO,
-  ): Promise<AppointmentDetailedView> {
+  ): Promise<{ appointment: AppointmentDetailedView; warning?: string; conflict?: any }> {
     const existing = this.appointmentRepo.findById(id);
     if (!existing) {
       const err: any = new Error('Agendamento não encontrado.');
@@ -179,22 +219,20 @@ export class SchedulingService {
 
     const startTime = dto.startTime || existing.startTime;
     let endTime = existing.endTime;
+    let warning: string | undefined;
+    let conflictData: any | undefined;
 
     if (dto.startTime || dto.durationMinutes) {
       const service = this.serviceRepo.findById(dto.serviceId || existing.serviceId);
       const duration = dto.durationMinutes || (service ? service.durationMinutes : 30);
       endTime = calculateEndTime(startTime, duration);
 
-      // Check conflict ignoring itself
+      // Verificação de conflito informativo ignorando a si próprio
       const existingAll = this.appointmentRepo.findAll();
       const conflictCheck = hasScheduleConflict(existingAll, startTime, endTime, id);
       if (conflictCheck.hasConflict) {
-        const err: any = new Error(
-          'Conflito de horário detectado! Já existe outro atendimento marcado neste intervalo.',
-        );
-        err.statusCode = 409;
-        err.conflictingAppointment = conflictCheck.conflictingWith;
-        throw err;
+        warning = 'Alerta Informativo: Existe outro agendamento no mesmo intervalo de horário.';
+        conflictData = conflictCheck.conflictingWith;
       }
     }
 
@@ -208,7 +246,24 @@ export class SchedulingService {
       throw new Error('Falha ao atualizar agendamento.');
     }
 
-    const user = dto.updatedByUser || 'Recepção (MedPet)';
+    // Atualização no Supabase se configurado
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        await supabase
+          .from('atendimento')
+          .update({
+            data_hora: startTime,
+            status: dto.status || existing.status,
+            observacoes: dto.notes !== undefined ? dto.notes : existing.notes,
+          })
+          .eq('id', id);
+      } catch (sbErr) {
+        console.warn('[Supabase Atendimento Update Warning]:', sbErr);
+      }
+    }
+
+    const user = dto.updatedByUser || 'Recepção (VetCare)';
     this.auditRepo.log({
       action: 'RESCHEDULE',
       targetId: id,
@@ -217,13 +272,17 @@ export class SchedulingService {
       details: `Agendamento ${id} alterado. Início: ${formatDateBR(startTime)} às ${formatTimeBR(startTime)}`,
     });
 
-    return updated;
+    return {
+      appointment: updated,
+      warning,
+      conflict: conflictData,
+    };
   }
 
   async updateAppointmentStatus(
     id: string,
     newStatus: AppointmentStatus,
-    user = 'Recepção (MedPet)',
+    user = 'Recepção (VetCare)',
   ): Promise<AppointmentDetailedView> {
     const existing = this.appointmentRepo.findDetailedById(id);
     if (!existing) {
@@ -235,6 +294,19 @@ export class SchedulingService {
     const updated = this.appointmentRepo.updateStatus(id, newStatus);
     if (!updated) {
       throw new Error('Falha ao atualizar agendamento.');
+    }
+
+    // Atualiza status no Supabase se configurado
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        await supabase
+          .from('atendimento')
+          .update({ status: newStatus })
+          .eq('id', id);
+      } catch (sbErr) {
+        console.warn('[Supabase Atendimento Status Warning]:', sbErr);
+      }
     }
 
     this.auditRepo.log({
@@ -269,7 +341,7 @@ export class SchedulingService {
 
   async cancelAppointment(
     id: string,
-    user = 'Recepção (MedPet)',
+    user = 'Recepção (VetCare)',
   ): Promise<AppointmentDetailedView> {
     return await this.updateAppointmentStatus(id, 'CANCELADO', user);
   }

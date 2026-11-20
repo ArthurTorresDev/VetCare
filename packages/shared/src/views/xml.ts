@@ -1,4 +1,4 @@
-import type { AppointmentDetailedView } from '../models/types.js';
+﻿import type { AppointmentDetailedView } from '../models/types.js';
 import { formatDateBR, formatTimeBR } from '../utils/date.js';
 
 function escapeXml(value: unknown): string {
@@ -79,7 +79,7 @@ export function generateAppointmentsXml(
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    `<relatorioAgendamentos clinica="MedPet / VetCare" total="${appointments.length}" geradoEm="${new Date().toISOString()}">`,
+    `<relatorioAgendamentos clinica="VetCare / VetCare" total="${appointments.length}" geradoEm="${new Date().toISOString()}">`,
     appointments.map(generateAppointment).join('\n'),
     '</relatorioAgendamentos>',
   ].join('\n');
@@ -383,7 +383,7 @@ td small {
 <div class="container">
 
   <header class="header">
-    <h1>MEDPET / VETCARE</h1>
+    <h1>VETCARE / VETCARE</h1>
     <p>RELATÓRIO DE AUDITORIA DE AGENDAMENTOS</p>
     <p>Gerado em ${escapeHtml(new Date().toLocaleString('pt-BR'))}</p>
   </header>
@@ -430,7 +430,7 @@ td small {
   </div>
 
   <footer class="footer">
-    Documento gerado automaticamente pelo sistema MedPet / VetCare.
+    Documento gerado automaticamente pelo sistema VetCare / VetCare.
     <br>Relatório de auditoria de agendamentos clínicos.
   </footer>
 

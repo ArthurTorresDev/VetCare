@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import {
@@ -77,7 +77,7 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
             ],
             ['Veterinário(a)', appointment.veterinarianName],
             ['Valor Previsto', formatCurrencyBRL(appointment.servicePrice)],
-            ['Criado por', appointment.createdByUser || 'Recepção (MedPet)'],
+            ['Criado por', appointment.createdByUser || 'Recepção (VetCare)'],
           ].map(([label, value]) => (
             <div key={label} className="flex justify-between items-center py-0.5">
               <span className="text-slate-500">{label}:</span>

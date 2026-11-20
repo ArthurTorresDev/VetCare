@@ -28,6 +28,11 @@ export const env = {
   // Banco de Dados
   databaseUrl: process.env.DATABASE_URL,
 
+  // Supabase (Backend & Storage)
+  supabaseUrl: process.env.SUPABASE_URL || '',
+  supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '',
+  supabaseBucketPetFotos: process.env.SUPABASE_BUCKET_PET_FOTOS || 'pet-fotos',
+
   // CORS
   allowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
     .split(',')

@@ -1,5 +1,5 @@
-/**
- * Serviço Centralizado de Feriados Nacionais - Brasil API & Regras MedPet
+﻿/**
+ * Serviço Centralizado de Feriados Nacionais - Brasil API & Regras VetCare
  * - Consulta exclusiva via GET https://brasilapi.com.br/api/feriados/v1/{ano}
  * - Cache persistente (PostgreSQL / In-Memory Store centralizado)
  * - Exatamente UMA requisição externa por ano
@@ -177,7 +177,7 @@ export class HolidayService {
           method: 'GET',
           headers: {
             Accept: 'application/json',
-            'User-Agent': 'VetCare-MedPet-Application',
+            'User-Agent': 'VetCare-VetCare-Application',
           },
         });
 
@@ -256,7 +256,7 @@ export class HolidayService {
   }
 
   /**
-   * Checagem unificada de regras operacionais de data e horário da MedPet
+   * Checagem unificada de regras operacionais de data e horário da VetCare
    */
   public async checkDate(dateStr: string, timeStr?: string): Promise<DateCheckResult> {
     const rawClean = dateStr.includes('/') ? dateStr.replace(/\//g, '-') : dateStr;
@@ -283,16 +283,16 @@ export class HolidayService {
     // 1. Alerta de Feriado Nacional
     if (holiday) {
       warnings.push(
-        `Atenção: ${dStr}/${mStr}/${year} é Feriado Nacional (${holiday.name}). A MedPet pode não ter expediente ou operar em escala de plantão/emergência.`
+        `Atenção: ${dStr}/${mStr}/${year} é Feriado Nacional (${holiday.name}). A VetCare pode não ter expediente ou operar em escala de plantão/emergência.`
       );
     }
 
     // 2. Alerta de Domingo
     if (isSunday) {
-      warnings.push('A clínica MedPet não possui expediente aos domingos.');
+      warnings.push('A clínica VetCare não possui expediente aos domingos.');
     }
 
-    // 3. Alertas de Horário de Atendimento da MedPet
+    // 3. Alertas de Horário de Atendimento da VetCare
     if (timeStr) {
       const [hourStr, minStr] = timeStr.split(':');
       const totalMinutes = parseInt(hourStr, 10) * 60 + parseInt(minStr, 10);
@@ -302,7 +302,7 @@ export class HolidayService {
         if (totalMinutes < 510 || totalMinutes > 750) {
           isSaturdayAfternoon = totalMinutes > 750;
           isOutsideClinicHours = true;
-          warnings.push('Aos sábados, o expediente da MedPet é exclusivamente das 08:30 às 12:30.');
+          warnings.push('Aos sábados, o expediente da VetCare é exclusivamente das 08:30 às 12:30.');
         }
       } else if (!isSunday) {
         // Segunda a Sexta: 08:00 (480 min) às 17:30 (1050 min)

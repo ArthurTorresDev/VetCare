@@ -17,6 +17,7 @@ import { hashService, HashService } from './hash.service.js';
 import { tokenService, TokenService } from './token.service.js';
 import { AuthenticationError } from './auth.service.js';
 import { env } from '../config/env.js';
+import { getSupabaseClient } from './supabase.service.js';
 
 export class UserService {
   private userRepo: IUserRepository;
@@ -192,6 +193,16 @@ export class UserService {
     // Revogar token atual para bloquear novas requisições imediatamente
     if (currentToken) {
       this.tokenizer.revokeToken(currentToken);
+    }
+
+    // Excluir no Supabase Auth caso o cliente Supabase esteja configurado
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        await supabase.auth.admin.deleteUser(userId);
+      } catch (sbErr) {
+        console.warn(`[Supabase Auth deleteUser warning for ${userId}]:`, sbErr);
+      }
     }
 
     // Excluir a conta do repositório

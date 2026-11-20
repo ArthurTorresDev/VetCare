@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+﻿import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   ClinicService,
   filterClientsByPrefix,
@@ -30,7 +30,7 @@ export function useScheduleForm(
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [conflictingAppointment, setConflictingAppointment] = useState<any | null>(null);
 
-  // Estados de Feriados Nacionais (Brasil API) e Horários Especiais da MedPet
+  // Estados de Feriados Nacionais (Brasil API) e Horários Especiais da VetCare
   const [dateCheckResult, setDateCheckResult] = useState<DateCheckResult | null>(null);
   const [showHolidayConfirmation, setShowHolidayConfirmation] = useState(false);
   const [checkingDate, setCheckingDate] = useState(false);
@@ -43,7 +43,7 @@ export function useScheduleForm(
     [clientes, tutorSearchInput],
   );
 
-  // Checagem automática de feriados e horários ao alterar data ou hora
+  // Checagem automática em tempo real de feriados e conflitos de horários
   useEffect(() => {
     if (!isOpen || !date) return;
 
@@ -55,13 +55,23 @@ export function useScheduleForm(
         const result = await checkDateAvailability(date, time);
         if (isMounted) {
           setDateCheckResult(result);
-          // Se for feriado e o usuário ainda não confirmou esta data explicitamente, exibe modal de confirmação
           if (result.isHoliday && holidayConfirmedForDate !== date) {
             setShowHolidayConfirmation(true);
           }
         }
+
+        // Checagem prévia informativa de conflito
+        const startIso = new Date(`${date}T${time}:00`).toISOString();
+        const conflictCheck = await appointmentService.checkScheduleConflict(startIso, duration);
+        if (isMounted) {
+          if (conflictCheck.hasConflict) {
+            setConflictingAppointment(conflictCheck.conflictingWith);
+          } else {
+            setConflictingAppointment(null);
+          }
+        }
       } catch (err) {
-        console.error('[checkDateAvailability Error]', err);
+        console.error('[checkDateAvailability/Conflict Error]', err);
       } finally {
         if (isMounted) setCheckingDate(false);
       }
@@ -71,7 +81,7 @@ export function useScheduleForm(
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [isOpen, date, time, holidayConfirmedForDate]);
+  }, [isOpen, date, time, duration, holidayConfirmedForDate]);
 
   const handleDateChange = useCallback((newDateRaw: string) => {
     const isoDate = formatToDateISO(newDateRaw);
@@ -147,6 +157,7 @@ export function useScheduleForm(
 
   /**
    * Executa a criação efetiva do agendamento
+   * NÃO bloqueia o salvamento quando há conflito de horário (alerta é meramente informativo)
    */
   const executeCreateAppointment = useCallback(async () => {
     if (!selectedClient) {
@@ -169,7 +180,7 @@ export function useScheduleForm(
         startTime: startIso,
         durationMinutes: Number(duration),
         notes,
-        createdByUser: 'Recepção (MedPet)',
+        createdByUser: 'Recepção (VetCare)',
       });
 
       onSuccess(created);
@@ -202,7 +213,6 @@ export function useScheduleForm(
     async (e: React.FormEvent) => {
       e.preventDefault();
       setErrorMessage(null);
-      setConflictingAppointment(null);
 
       if (!selectedClient) {
         setErrorMessage('Por favor, selecione um tutor na lista de sugestões.');
@@ -214,14 +224,14 @@ export function useScheduleForm(
       }
 
       // Se houver aviso de feriado ou horário especial e ainda não tiver sido confirmado explicitamente:
-      if (dateCheckResult?.hasWarning && !showHolidayConfirmation) {
+      if (dateCheckResult?.hasWarning && !showHolidayConfirmation && holidayConfirmedForDate !== date) {
         setShowHolidayConfirmation(true);
         return;
       }
 
       await executeCreateAppointment();
     },
-    [selectedClient, petId, dateCheckResult, showHolidayConfirmation, executeCreateAppointment],
+    [selectedClient, petId, dateCheckResult, showHolidayConfirmation, holidayConfirmedForDate, date, executeCreateAppointment],
   );
 
   /**
@@ -230,7 +240,8 @@ export function useScheduleForm(
   const confirmHolidayAndSave = useCallback(async () => {
     setShowHolidayConfirmation(false);
     setHolidayConfirmedForDate(date);
-  }, [date]);
+    await executeCreateAppointment();
+  }, [date, executeCreateAppointment]);
 
   /**
    * Usuário decide cancelar ou trocar a data do agendamento (restaura data anterior)

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { AtendenteRepository } from '../repositories/atendente.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 
@@ -50,7 +50,7 @@ export class AtendenteController {
         action: 'CREATE',
         targetId: created.id,
         targetType: 'CLIENT',
-        user: 'Administração MedPet',
+        user: 'Administração VetCare',
         details: `Atendente cadastrado: ${created.nome} (${created.email})`,
       });
 

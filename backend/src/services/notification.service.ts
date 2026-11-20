@@ -1,4 +1,4 @@
-import { EmailNotification, NotificationType } from '@vetcare/shared';
+﻿import { EmailNotification, NotificationType } from '@vetcare/shared';
 import { NotificationRepository } from '../repositories/notification.repository.js';
 
 export class NotificationService {
@@ -38,8 +38,8 @@ export class NotificationService {
       type: 'CONFIRMACAO',
       recipientEmail,
       recipientName,
-      subject: 'Confirmação de Agendamento - MedPet Clínica Veterinária',
-      body: `Olá ${recipientName},\n\nSeu agendamento na MedPet foi confirmado com sucesso!\n\nDetalhes do atendimento:\n${details}\n\nEm caso de dúvidas ou necessidade de reagendamento, entre em contato conosco.\n\nAtenciosamente,\nEquipe MedPet Veterinária`,
+      subject: 'Confirmação de Agendamento - VetCare Clínica Veterinária',
+      body: `Olá ${recipientName},\n\nSeu agendamento na VetCare foi confirmado com sucesso!\n\nDetalhes do atendimento:\n${details}\n\nEm caso de dúvidas ou necessidade de reagendamento, entre em contato conosco.\n\nAtenciosamente,\nEquipe VetCare Veterinária`,
     });
   }
 
@@ -54,8 +54,8 @@ export class NotificationService {
       type: 'ALTERACAO',
       recipientEmail,
       recipientName,
-      subject: 'Aviso de Alteração de Agendamento - MedPet Clínica Veterinária',
-      body: `Olá ${recipientName},\n\nHouve uma atualização no seu agendamento.\n\nNovos detalhes:\n${details}\n\nAtenciosamente,\nEquipe MedPet Veterinária`,
+      subject: 'Aviso de Alteração de Agendamento - VetCare Clínica Veterinária',
+      body: `Olá ${recipientName},\n\nHouve uma atualização no seu agendamento.\n\nNovos detalhes:\n${details}\n\nAtenciosamente,\nEquipe VetCare Veterinária`,
     });
   }
 
@@ -70,8 +70,8 @@ export class NotificationService {
       type: 'CANCELAMENTO',
       recipientEmail,
       recipientName,
-      subject: 'Aviso de Cancelamento de Agendamento - MedPet',
-      body: `Olá ${recipientName},\n\nInformamos que o seu agendamento foi cancelado.\n\nDetalhes:\n${details}\n\nSe desejar remarcar uma nova data, estamos à sua disposição.\n\nAtenciosamente,\nEquipe MedPet Veterinária`,
+      subject: 'Aviso de Cancelamento de Agendamento - VetCare',
+      body: `Olá ${recipientName},\n\nInformamos que o seu agendamento foi cancelado.\n\nDetalhes:\n${details}\n\nSe desejar remarcar uma nova data, estamos à sua disposição.\n\nAtenciosamente,\nEquipe VetCare Veterinária`,
     });
   }
 

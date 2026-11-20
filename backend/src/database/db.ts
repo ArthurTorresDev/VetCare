@@ -95,6 +95,18 @@ class DatabaseConnection {
         criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
 
+      CREATE TABLE IF NOT EXISTS feriado_nacional (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ano INTEGER NOT NULL,
+        data_feriado DATE NOT NULL,
+        nome VARCHAR(150) NOT NULL,
+        tipo VARCHAR(50) NOT NULL DEFAULT 'national',
+        criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT uk_feriado_ano_data UNIQUE (ano, data_feriado)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_feriado_ano ON feriado_nacional(ano);
+      CREATE INDEX IF NOT EXISTS idx_feriado_data ON feriado_nacional(data_feriado);
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(LOWER(email));
     `);
   }

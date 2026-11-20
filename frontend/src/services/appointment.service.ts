@@ -1,4 +1,4 @@
-﻿import {
+import {
   AppointmentDetailedView,
   AppointmentStatus,
   CreateAppointmentDTO,
@@ -33,9 +33,25 @@ export async function fetchAppointmentKPIStats(): Promise<AppointmentKPIStats> {
   return res.json();
 }
 
+export async function checkScheduleConflict(
+  startTime: string,
+  durationMinutes: number,
+  ignoreAppointmentId?: string,
+): Promise<{ hasConflict: boolean; conflictingWith?: any }> {
+  const params = new URLSearchParams({
+    startTime,
+    durationMinutes: String(durationMinutes),
+  });
+  if (ignoreAppointmentId) params.append('ignoreAppointmentId', ignoreAppointmentId);
+
+  const res = await fetch(`${API_URL}/appointments/check-conflict?${params.toString()}`);
+  if (!res.ok) return { hasConflict: false };
+  return res.json();
+}
+
 export async function createAppointment(
   dto: CreateAppointmentDTO,
-): Promise<AppointmentDetailedView> {
+): Promise<AppointmentDetailedView & { warning?: string; conflict?: any }> {
   const res = await fetch(`${API_URL}/appointments`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -44,7 +60,7 @@ export async function createAppointment(
   const data = await res.json();
   if (!res.ok) {
     const error: any = new Error(data.error || 'Erro ao registrar agendamento');
-    error.conflictingAppointment = data.conflictingAppointment;
+    error.conflictingAppointment = data.conflictingAppointment || data.conflict;
     throw error;
   }
   return data;
@@ -53,7 +69,7 @@ export async function createAppointment(
 export async function updateAppointment(
   id: string,
   dto: UpdateAppointmentDTO,
-): Promise<AppointmentDetailedView> {
+): Promise<AppointmentDetailedView & { warning?: string; conflict?: any }> {
   const res = await fetch(`${API_URL}/appointments/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -62,7 +78,7 @@ export async function updateAppointment(
   const data = await res.json();
   if (!res.ok) {
     const error: any = new Error(data.error || 'Erro ao atualizar agendamento');
-    error.conflictingAppointment = data.conflictingAppointment;
+    error.conflictingAppointment = data.conflictingAppointment || data.conflict;
     throw error;
   }
   return data;

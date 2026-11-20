@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { AtendimentoRepository } from '../repositories/atendimento.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 
@@ -57,7 +57,7 @@ export class AtendimentoController {
         action: 'CREATE',
         targetId: created.id,
         targetType: 'APPOINTMENT',
-        user: 'Recepção MedPet',
+        user: 'Recepção VetCare',
         details: `Atendimento registrado para pet ${created.petId} (${created.tipoServico})`,
       });
 

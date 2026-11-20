@@ -1,4 +1,4 @@
-import {
+﻿import {
   Client,
   Pet,
   ClinicService,
@@ -61,14 +61,14 @@ export class InMemoryStore {
     this.emailNotifications = [];
     this.users = [];
 
-    // Carga inicial alinhada ao medpet.sql
+    // Carga inicial alinhada ao vetcare.sql
     this.veterinarios = [
       {
         id: 'v1',
         nome: 'Dra. Camila Rocha',
         crmv: 'SP-12345',
         telefone: '(11) 98765-1111',
-        email: 'camila.rocha@medpet.com',
+        email: 'camila.rocha@vetcare.com',
         criadoEm: new Date().toISOString(),
       },
       {
@@ -76,7 +76,7 @@ export class InMemoryStore {
         nome: 'Dr. Carlos Alberto',
         crmv: 'SP-67890',
         telefone: '(11) 98765-2222',
-        email: 'carlos.alberto@medpet.com',
+        email: 'carlos.alberto@vetcare.com',
         criadoEm: new Date().toISOString(),
       },
     ];
@@ -85,14 +85,14 @@ export class InMemoryStore {
       {
         id: 'a1',
         nome: 'Ana Paula Santos',
-        email: 'ana.santos@medpet.com',
+        email: 'ana.santos@vetcare.com',
         telefone: '(11) 98765-3333',
         criadoEm: new Date().toISOString(),
       },
       {
         id: 'a2',
         nome: 'Marcos Vinicius',
-        email: 'marcos.vinicius@medpet.com',
+        email: 'marcos.vinicius@vetcare.com',
         telefone: '(11) 98765-4444',
         criadoEm: new Date().toISOString(),
       },

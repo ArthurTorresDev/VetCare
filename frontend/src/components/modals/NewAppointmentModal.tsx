@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import {
@@ -46,7 +46,7 @@ interface NewAppointmentModalProps {
   onSubmit: (e: React.FormEvent) => void;
   tutorInputRef: React.RefObject<HTMLInputElement | null>;
 
-  //Verificação de Feriados & Horários MedPet
+  // Verificação de Feriados & Horários VetCare
   dateCheckResult?: DateCheckResult | null;
   checkingDate?: boolean;
   showHolidayConfirmation?: boolean;
@@ -119,7 +119,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               Marcar Consulta ou Procedimento
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Siga os passos abaixo. O sistema verificará feriados, conflitos e sincronizará no Google Agenda.
+              Siga os passos abaixo. O sistema verificará feriados, disponibilidade e sincronizará no calendário.
             </p>
           </div>
           <button
@@ -168,7 +168,31 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
           </div>
         </div>
 
-        {/* Alerta de Erro de Submissão */}
+        {/* Alerta Visual de Conflito de Horário - MERAMENTE INFORMATIVO, SEM IMPEDIR SALVAMENTO */}
+        {conflictingAppointment && (
+          <div
+            role="alert"
+            className="bg-amber-50 border border-amber-300 text-amber-900 text-xs p-3.5 rounded-xl mb-4 flex items-start gap-2.5 animate-fadeIn"
+          >
+            <i className="ph-fill ph-warning text-base text-amber-600 shrink-0 mt-0.5"></i>
+            <div>
+              <p className="font-bold text-amber-900">Aviso informativo de sobreposição de horário:</p>
+              <p className="mt-0.5 text-amber-800 leading-relaxed">
+                Já existe outro atendimento registrado neste intervalo de horário:
+              </p>
+              <div className="mt-1 text-[11px] text-amber-900 bg-amber-100/70 p-2 rounded-lg border border-amber-200">
+                <strong>Paciente:</strong> {conflictingAppointment.patientName || conflictingAppointment.petName || 'Paciente'} (
+                {conflictingAppointment.procedure || conflictingAppointment.serviceName || 'Consulta'}) &bull;{' '}
+                <strong>Profissional:</strong> {conflictingAppointment.veterinarian || conflictingAppointment.veterinarianName || 'Clínico'}
+              </div>
+              <p className="mt-1 text-[10px] text-amber-700 italic">
+                * Você pode continuar e salvar o agendamento normalmente como atendimento simultâneo ou encaixe.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Alerta de Erro de Validação de Campos */}
         {errorMessage && (
           <div
             role="alert"
@@ -176,15 +200,8 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
           >
             <i className="ph-fill ph-warning-circle text-base text-rose-500 shrink-0 mt-0.5"></i>
             <div>
-              <p className="font-bold">Atenção ao agendar:</p>
+              <p className="font-bold">Atenção ao preencher:</p>
               <p className="mt-0.5">{errorMessage}</p>
-              {conflictingAppointment && (
-                <p className="mt-1 text-[11px] text-rose-600 bg-rose-100/60 p-1.5 rounded-lg">
-                  <strong>Conflito detectado com:</strong> {conflictingAppointment.patientName} (
-                  {conflictingAppointment.procedure}) — Dr(a).{' '}
-                  {conflictingAppointment.veterinarian}
-                </p>
-              )}
             </div>
           </div>
         )}

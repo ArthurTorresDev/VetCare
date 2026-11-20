@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @vetcare/shared - Modelos de Domínio, Entidades e DTOs
  */
 
@@ -20,7 +20,7 @@ export type AtendimentoStatus =
   | 'Cancelado'
   | string;
 
-// ─── Entidades medpet.sql ─────────────────────────────────────────────────────
+// ─── Entidades vetcare.sql ─────────────────────────────────────────────────────
 
 export interface Veterinario {
   id: string;

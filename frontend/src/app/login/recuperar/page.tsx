@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -58,7 +58,7 @@ export default function RecoverPasswordPage() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="exemplo@medpet.com.br"
+              placeholder="exemplo@vetcare.com.br"
               className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-10 pr-4 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 focus:border-[#00ba7c] focus:outline-none focus:ring-4 focus:ring-[#00ba7c]/15"
             />
           </div>

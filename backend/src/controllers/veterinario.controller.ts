@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { VeterinarioRepository } from '../repositories/veterinario.repository.js';
 import { AuditRepository } from '../repositories/audit.repository.js';
 
@@ -50,7 +50,7 @@ export class VeterinarioController {
         action: 'CREATE',
         targetId: created.id,
         targetType: 'CLIENT', // audit categorizado
-        user: 'Administração MedPet',
+        user: 'Administração VetCare',
         details: `Veterinário cadastrado: ${created.nome} (CRMV: ${created.crmv})`,
       });
 
