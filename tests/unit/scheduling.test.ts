@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import {
   calculateEndTime,
   isOverlapping,
@@ -124,7 +124,7 @@ describe('Regras de Negócio de Agendamento (Domínio VetCare)', () => {
 
     const xml = generateAppointmentsXml(mockDetailed);
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
-    expect(xml).toContain('<relatorioAgendamentos clinica="MedPet / VetCare"');
+    expect(xml).toContain('<relatorioAgendamentos clinica="VetCare / VetCare"');
     expect(xml).toContain('<tutor nome="Arthur"');
     expect(xml).toContain('<paciente nome="Thor"');
   });

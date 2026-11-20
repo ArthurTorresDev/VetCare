@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+﻿import { describe, it, expect, beforeEach } from 'vitest';
 import { HashService } from '../../backend/src/services/hash.service.js';
 import { TokenService, TokenBlacklistStore } from '../../backend/src/services/token.service.js';
 import { InMemoryUserRepository } from '../../backend/src/repositories/in-memory-user.repository.js';
@@ -129,7 +129,7 @@ describe('Sistema de Autenticação e Gerenciamento de Usuários (MVC & RESTful)
   describe('3. Validações de Entrada e Segurança', () => {
     it('deve validar formatos de e-mail válidos e inválidos', () => {
       expect(isValidEmail('tutor@clinica.com.br')).toBe(true);
-      expect(isValidEmail('arthur.steiner@medpet.vet')).toBe(true);
+      expect(isValidEmail('arthur.steiner@vetcare.vet')).toBe(true);
       expect(isValidEmail('invalido@')).toBe(false);
       expect(isValidEmail('@semdominio.com')).toBe(false);
       expect(isValidEmail('email sem arroba')).toBe(false);

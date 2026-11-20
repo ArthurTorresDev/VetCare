@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+﻿import { describe, it, expect, beforeEach } from 'vitest';
 import { VeterinarioRepository } from '../../backend/src/repositories/veterinario.repository.js';
 import { AtendenteRepository } from '../../backend/src/repositories/atendente.repository.js';
 import { AtendimentoRepository } from '../../backend/src/repositories/atendimento.repository.js';
 import { InMemoryStore } from '../../backend/src/models/in-memory.store.js';
 
-describe('CRUD das Entidades medpet.sql (Veterinários, Atendentes e Atendimentos)', () => {
+describe('CRUD das Entidades vetcare.sql (Veterinários, Atendentes e Atendimentos)', () => {
   let vetRepo: VeterinarioRepository;
   let atendenteRepo: AtendenteRepository;
   let atendimentoRepo: AtendimentoRepository;
@@ -29,7 +29,7 @@ describe('CRUD das Entidades medpet.sql (Veterinários, Atendentes e Atendimento
         nome: 'Dr. Lucas Prado',
         crmv: 'SP-99887',
         telefone: '(11) 98888-7777',
-        email: 'lucas.prado@medpet.com',
+        email: 'lucas.prado@vetcare.com',
       });
 
       expect(created.id).toBeDefined();
@@ -38,7 +38,7 @@ describe('CRUD das Entidades medpet.sql (Veterinários, Atendentes e Atendimento
 
       const found = await vetRepo.findById(created.id);
       expect(found).not.toBeNull();
-      expect(found?.email).toBe('lucas.prado@medpet.com');
+      expect(found?.email).toBe('lucas.prado@vetcare.com');
     });
 
     it('deve atualizar dados do veterinário', async () => {
@@ -56,7 +56,7 @@ describe('CRUD das Entidades medpet.sql (Veterinários, Atendentes e Atendimento
       const created = await vetRepo.create({
         nome: 'Dr. Temporário',
         crmv: 'SP-00000',
-        email: 'temp.vet@medpet.com',
+        email: 'temp.vet@vetcare.com',
       });
 
       const deleted = await vetRepo.delete(created.id);
@@ -67,28 +67,28 @@ describe('CRUD das Entidades medpet.sql (Veterinários, Atendentes e Atendimento
     });
   });
 
-  describe('Atendentes (Recepção MedPet)', () => {
+  describe('Atendentes (Recepção VetCare)', () => {
     it('deve listar e cadastrar atendentes', async () => {
       const initial = await atendenteRepo.findAll();
       expect(initial.length).toBeGreaterThanOrEqual(2);
 
       const created = await atendenteRepo.create({
         nome: 'Juliana Paes',
-        email: 'juliana.paes@medpet.com',
+        email: 'juliana.paes@vetcare.com',
         telefone: '(11) 97777-6666',
       });
 
       expect(created.id).toBeDefined();
       expect(created.nome).toBe('Juliana Paes');
 
-      const found = await atendenteRepo.findByEmail('juliana.paes@medpet.com');
+      const found = await atendenteRepo.findByEmail('juliana.paes@vetcare.com');
       expect(found?.id).toBe(created.id);
     });
 
     it('deve atualizar e remover atendente', async () => {
       const created = await atendenteRepo.create({
         nome: 'Marcos Teste',
-        email: 'marcos.teste@medpet.com',
+        email: 'marcos.teste@vetcare.com',
       });
 
       const updated = await atendenteRepo.update(created.id, {

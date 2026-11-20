@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HolidayService } from '../../backend/src/services/holiday.service';
 import { holidayRepository } from '../../backend/src/repositories/holiday.repository';
 
@@ -51,7 +51,7 @@ describe('Serviço Centralizado de Feriados Nacionais (Brasil API)', () => {
     expect(names).toContain('Dia Nacional de Zumbi e da Consciência Negra');
   });
 
-  it('deve alertar sobre agendamento aos domingos (MedPet fechada)', async () => {
+  it('deve alertar sobre agendamento aos domingos (VetCare fechada)', async () => {
     // 22 de Novembro de 2026 é Domingo
     const domingo = await service.checkDate('2026-11-22', '10:00');
     expect(domingo.isSunday).toBe(true);
@@ -59,7 +59,7 @@ describe('Serviço Centralizado de Feriados Nacionais (Brasil API)', () => {
     expect(domingo.warnings.some((w) => w.includes('domingos'))).toBe(true);
   });
 
-  it('deve validar horários de Sábado (MedPet aberta apenas das 08:30 às 12:30)', async () => {
+  it('deve validar horários de Sábado (VetCare aberta apenas das 08:30 às 12:30)', async () => {
     // 21 de Novembro de 2026 é Sábado
     const sabadoOk = await service.checkDate('2026-11-21', '10:00');
     expect(sabadoOk.isSaturdayAfternoon).toBe(false);
@@ -71,7 +71,7 @@ describe('Serviço Centralizado de Feriados Nacionais (Brasil API)', () => {
     expect(sabadoTarde.warnings.some((w) => w.includes('08:30 às 12:30'))).toBe(true);
   });
 
-  it('deve validar horário regular de Segunda a Sexta (MedPet aberta das 08:00 às 17:30)', async () => {
+  it('deve validar horário regular de Segunda a Sexta (VetCare aberta das 08:00 às 17:30)', async () => {
     // 18 de Novembro de 2026 é Quarta-feira
     const diaUtilOk = await service.checkDate('2026-11-18', '14:30');
     expect(diaUtilOk.hasWarning).toBe(false);
